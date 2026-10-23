@@ -1,0 +1,453 @@
+@font-face{
+	font-family: 'WebSymbolsRegular';
+	src: 	url('/RESOURCES/fonts/websymbols-regular-webfont.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+.botonMenuPrincipal{
+  border-radius: 50%;
+  border:1px solid black;
+  background-color:white;
+}
+.botonMenuPrincipalAnimado{
+  border-radius: 50%;
+  animation: animar 2s infinite;
+  border:1px solid black;
+}
+.nombrePropietarios {
+	display: inline-block;
+	max-width: 700px;
+}
+
+
+@keyframes animar {
+  0%   {background-color:white; }
+  50%  {background-color:#ff7800; }
+  100% {background-color:white; }
+}
+
+#panelLateral{
+  text-align: center;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 99999;
+}
+#panelLateralContenido{
+  padding: 10px 15px;
+  height: auto;
+  width: 100%;
+  border-bottom: 1px solid #003366;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  opacity: 1;
+  background-color: white;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+#botonLateral{
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  height: 25px;
+  width: 50px;
+  position: relative;
+  top: 0;
+  margin: 0 auto;
+  border: 1px solid #003366;
+  border-top: none;
+  font-family: 'Web Symbols';
+  padding-top: 3px;
+  opacity: 0.9;
+  background-color: #003366;
+  color: white;
+  cursor: pointer;
+  box-sizing: initial;
+}
+
+.panelLateralElement{
+    color: #003366;
+    margin-bottom: 0;
+    
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+.panelLateralElement:hover{
+    color: #ff7800;
+}
+.panelLateralElementSelected{
+    color: #ff7800;
+    margin-bottom: 0;
+    
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+.panelLateralElementSelected:hover{
+    color: #ff7800;
+}
+.panelLateralSymbol{
+    font-size: 16px;
+    
+    align-items: center;
+    line-height: 1;
+}
+.panelLateralLabel{
+    font-size: 15px;
+    cursor: pointer;
+    line-height: 1;
+}
+.websymbol{
+    font-family: 'Web Symbols';
+}
+
+
+
+#panelHome{
+	height: 60%;
+}
+#panelUsuarios{
+	height: 60%;
+}
+#panelEmpleados{
+	height: 60%;
+}
+#panelMensajes{
+	height: 60%;
+}
+#panelComunidades{
+	height: 60%;
+}
+#panelArchivos{
+	height: 60%;
+}
+#panelRecibos{
+	height: 60%;
+}
+#panelCorrespondencias{
+	height: 60%;
+}
+#panelExportar{
+	height: 60%;
+}
+
+#listadoUsuarios,#listadoMensajes,#listadoRecibos,#listadoEmpleados{
+	overflow: auto;
+	height: 95%;
+}
+
+#listadoCorrespondencias{
+	overflow: auto;
+	height: 95%;
+}
+#listadoComunidades{
+	overflow: auto;
+	height: 90%;
+}
+#listadoArchivos{
+	overflow: auto;
+	height: 90%;
+}
+#listadoEventos{
+	overflow: auto;
+	height: 90%;
+	color: red;
+
+}
+.eventosItem:hover{
+  text-decoration: underline;
+	cursor:pointer;
+}
+.listado{
+	background-color: white;
+	border-radius: 5px;
+	border:solid 1px black;
+	width: 95%;
+	padding: 1%;
+	margin: 1%;
+	text-align: left;
+}
+.iconos{
+	float: right;
+	cursor: pointer;
+}
+.iconos > img{
+	height: 35px;
+	width: 35px;
+	cursor: pointer;
+}
+.iconos2{
+	float:right;
+	cursor: pointer;
+	text-align: right;
+}
+.iconos2 > img{
+	height: 35px;
+	width: 35px;
+	cursor: pointer;
+	position: relative;
+	top:-1px;
+}
+.iconos3{
+	float:right;
+	cursor: pointer;
+	text-align: right;
+	position: relative;
+	top:10px;
+}
+.compress{
+	height: 0px;
+	overflow: hidden;
+
+}
+
+#panelAdd{
+	font-size: 60px;
+	position: fixed;
+	right: 50px;
+	bottom: 50px;
+	color: green;
+	z-index:10000;
+}
+#panelAdd:hover{
+	color:#ff7800;
+	cursor:pointer;
+}
+
+.panelAuxiliar{
+	position: fixed;
+	height: 100%;
+	left:0px;
+	top:0px;
+	margin:0px;
+	width: 100%;
+	background: black;
+	background-color: rgba(0,0,0,0.7);
+	z-index: 5;
+	display: none;
+
+}
+.panelAuxiliarInterior{
+	width:800px;
+	height:80%;
+	overflow:auto;
+	padding: 1%;
+	text-align: center;
+	display:block;
+	margin-top: 5%;
+	margin-left: auto;
+	margin-right: auto;
+	border:solid black 1px;
+	border-radius: 3px;
+	background-color:#e6e6e6;
+
+
+}
+
+#tablaUsuarios{
+	margin:auto;
+	font-size: 20px;
+}
+#tablaHistorial{
+	margin:auto;
+	font-size: 20px;
+	width:90%;
+}
+#tablaComunidades{
+	margin:auto;
+	font-size: 20px;
+}
+#textoCorrespondencia{
+	width: 90%;
+	height: 30%;
+}
+table {
+	border-collapse: separate;
+}
+img{
+	vertical-align: baseline;
+}
+.buttons{
+	 border-radius: 50%;
+	 position: relative;
+	 top: -8px;
+   color: white;
+	 padding: 5px;
+	 font-size: 25px;
+	 cursor: pointer;
+	 margin-left: 6px;
+}
+.buttons2{
+	font-size: 125%;
+	position: relative;
+	top: 1px;
+	left: 5px;
+	cursor:pointer;
+}
+.buttons3 {
+	border-radius: 50%;
+	position: relative;
+	top: -10px;
+	color: white;
+	font-size: 25px;
+	cursor: pointer;
+	margin-left: 6px;
+	width: 35px;
+	height: 35px;
+	text-align: center;
+	padding-top: 5px;
+}
+#divElementoTelefono{
+	width: 20%;
+	display: inline-block;
+}
+#divElementoFinca{
+	width: 60%;
+	display: inline-block;
+}
+#divElementoDestinatario{
+	width: 60%;
+	display: inline-block;
+}
+#divElementoCorreo{
+	width: 40%;
+	display: inline-block;
+}
+#divElementoContacto{
+	width: 40%;
+	display: inline-block;
+}
+#divElementoTipo{
+	width: 10%;
+	display: inline-block;
+}
+#divListadoUsuariosCorrespondencias {
+	width: 90%;
+	border-radius: 10px;
+	background: white;
+	text-align: left;
+	padding: 10px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 10px;
+	margin-top: 10px;
+	height: 40%;
+	overflow: auto;
+}
+#divMensajesVisor {
+	width: 95%;
+	height: 94%;
+	border: solid 1px black;
+	border-radius: 5px;
+	background: white;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+#inputMensajesEnviar {
+	height: 6%;
+	border: solid 1px black;
+	border-radius: 5px;
+	width: 70%;
+	margin-left: auto;
+	margin-top: 5px;
+	float: left;
+}
+#buttonMensajesEnviar {
+	height: 6%;
+	float: right;
+	margin-top: 5px;
+	border: solid 1px;
+	border-radius: 5px;
+	width: 24%;
+	margin-right: 5%;
+}
+
+.misMensajes {
+	background-color: #5ad1ff;
+	margin: 10px;
+	border: solid 1px #37779d;
+	border-radius: 5px;
+	text-align: left;
+	max-width: 80%;
+}
+.tusMensajes {
+	background-color: #5aff8b;
+	margin: 10px;
+	border: solid 1px #3caa76;
+	border-radius: 5px;
+	margin-left: auto;
+	text-align: right;
+	max-width: 80%;
+	min-width: 60%;
+}
+.divTelefonoUsuarios,.divCorreoUsuarios,.divDireccionUsuarios,.divFincaUsuarios{
+		border: solid 1px grey;
+		border-radius: 15px;
+		width: 99%;
+		padding: 8px;
+		margin: 5px;
+}
+
+.divTopMensajes{
+	font-size: 70%;
+}
+
+.divBodyMensajes{
+	margin: 5px;
+}
+.divBottomMensajes{
+	font-size: 70%;
+
+	text-align: right;
+}
+.historialItem{
+	width: 100%;
+	border-radius: 5px;
+	border:solid 1px black;
+}
+.divTopHistorialItem{
+	font-size: 75%;
+	background-color: #d9d5d5;
+	padding: 10px;
+	text-align: left;
+}
+.divAlertaHistorialItem{
+	float: right;
+	margin-right: 10px;
+
+}
+.divBodyHistorialItem{
+ text-align: left;
+ padding: 10px;
+}
+.divBottomHistorialItem{
+	font-size: 75%;
+	background-color: #d9d5d5;
+	padding: 10px;
+	text-align: right;
+}
+.radio{
+	margin-left: 10px;
+}
+.checkboxLabel{
+	position: relative;
+	top:-5px;
+	left:5px;
+}
+.radioLabel{
+	font-size: 90%;
+	position: relative;
+	top:-5px;
+	left:5px;
+}
+#calBorder {
+    z-index: 999999 !important;
+}

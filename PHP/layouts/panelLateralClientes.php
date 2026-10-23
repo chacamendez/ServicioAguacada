@@ -1,0 +1,5 @@
+<div class="panelLateralElement" ind=4 onclick="executeAction('rellenarPanel','&destino=home');" ><div class="panelLateralSymbol"><i class="fa fa-home"></i></div><label class="panelLateralLabel">Home</label></div>
+<div class="panelLateralElement"  onclick="executeAction('prepararPanel','&destino=usuarios')" ><div class="panelLateralSymbol"><i class="fa fa-user"></i></div><label class="panelLateralLabel">Cuenta</label></div>
+<div class="panelLateralElement"  onclick="executeAction('prepararPanel','&destino=mensajes');" ><div class="panelLateralSymbol"><i class="fa fa-comment"></i></div><label class="panelLateralLabel">Mensajes</label></div>
+<div class="panelLateralElement" ind=5 onclick="executeAction('rellenarPanel','&destino=archivos');" ><div class="panelLateralSymbol"><i class="fa fa-file "></i></div><label class="panelLateralLabel">Archivos</label></div>
+<div class="panelLateralElement" onclick="executeAction('loggin','&destino=logout');" ><div class="panelLateralSymbol"><i class="fa fa-sign-out "></i></div><label class="panelLateralLabel">Salir</label></div>

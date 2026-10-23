@@ -1,0 +1,843 @@
+/* ==========================================================================
+   1. VARIABLES Y RESETEO
+   ========================================================================== */
+:root {
+    --color-primario: #0056b3;
+    --color-secundario: #f8f9fa;
+    --color-texto: #333333;
+    --color-blanco: #ffffff;
+    --color-borde: #dddddd;
+    --color-falso-boton: #f0f0f0;
+    --color-falso-boton-hover: #e0e0e0;
+    --fuente-principal: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+    /* Colores para pestañas seleccionadas */
+    --color-tab-inicio: #012697;
+    --color-tab-contactar: #719626;
+    --color-tab-situacion: #b36500;
+    --color-tab-clientes: #911f00;
+}
+
+* {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    font-family: var(--fuente-principal);
+    background-color: var(--color-secundario);
+    color: var(--color-texto);
+    overflow: hidden;
+    font-size: clamp(12px, 2.5vw, 16px);
+    
+}
+
+/* ==========================================================================
+   2. ESTRUCTURA GLOBAL Y LAYOUT
+   ========================================================================== */
+#cuerpo {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+}
+
+#panelPrincipal {
+    height: 72vh; /* Cambiado de 77vh a 72vh */
+    padding: 15px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 0 0 72vh; /* Coincide con la altura */
+}
+
+#contenido {
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+    margin-top: 0;
+    overflow: hidden;
+}
+
+.paneles {
+    width: 100%;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.paneles[status="active"] {
+    display: block;
+    position: relative;
+    z-index: 5;
+}
+
+
+/* Centrado robusto para el panel */
+.panelAuxiliar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.panelAuxiliar[style*="display: flex"] {
+    display: flex !important;
+}
+
+.panelAuxiliarInterior {
+    width: clamp(90%, 95vw, 900px); /* En pantallas pequeñas ocupa el 95% y en grandes se limita a 900px */
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: clamp(10px, 3vw, 25px); /* El padding interior se reduce automáticamente en pantallas estrechas */
+    text-align: center;
+    margin: 0 auto;
+    border: solid black 1px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    position: relative;
+	margin-top:5%;
+}
+/* ==========================================================================
+   3. CABECERA Y NAVEGACIÓN
+   ========================================================================== */
+#cabecera {
+    background-color: var(--color-blanco);
+    padding: 0;
+    border-bottom: 1px solid var(--color-borde);
+    height: 23vh;
+    width: 100%;
+    position: relative;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 0 0 23vh;
+}
+
+#titulo {
+    position: relative;
+    width: 100%;
+    height: 85%;
+    min-height: 0;
+    background-color: #c7dff9;
+    
+    background-image: url('../RESOURCES/backgroundTitulo.png?v=1.0');
+    background-repeat: no-repeat;
+    background-position: left center; /* Anclada a la izquierda para que el logotipo de la casa y el bloque de color se mantengan alineados */
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centra el texto de forma elegante */
+    padding: 0 20px;
+}
+
+.texto-con-skin {
+    /* Usamos clamp para que se adapte pero tenga un tamaño mínimo y máximo seguro */
+    font-size: clamp(1.8rem, 4vw, 4.5rem);
+    
+    font-weight: bold;
+    font-family: var(--fuente-principal);
+    
+    /* 1. Ponemos la imagen que servirá de "skin" */
+    background-image: url('../RESOURCES/skin2.png?v=1.0');
+    background-size: cover;
+    background-position: center;
+    
+    /* 2. Recortamos el fondo para que solo sea visible dentro de la forma de las letras */
+    -webkit-background-clip: text;
+    background-clip: text;
+    
+    /* 3. Hacemos el color del texto transparente para que se vea la imagen de fondo a través de él */
+    color: transparent;
+    
+    /* Opcional: un borde o sombra sutil para que resalte sobre el fondo de la página */
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.texto-con-skin-2 {
+    /* Usamos clamp para que se adapte pero tenga un tamaño mínimo y máximo seguro */
+    font-size: clamp(1.8rem, 4vw, 4.5rem);
+    
+    font-weight: bold;
+    font-family: var(--fuente-principal);
+    
+    /* 1. Ponemos la imagen que servirá de "skin" */
+    background-image: url('../RESOURCES/skin.png?v=1.0');
+    background-size: cover;
+    background-position: center;
+    
+    /* 2. Recortamos el fondo para que solo sea visible dentro de la forma de las letras */
+    -webkit-background-clip: text;
+    background-clip: text;
+    
+    /* 3. Hacemos el color del texto transparente para que se vea la imagen de fondo a través de él */
+    color: transparent;
+    
+    /* Opcional: un borde o sombra sutil para que resalte sobre el fondo de la página */
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#imagentitulo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    max-height: 100%;
+    width: auto;
+    padding: 5px 10px;
+    z-index: 2;
+}
+
+/* Efecto de texto estilo cristal / agua translúcida */
+.texto-titulo-efecto {
+    font-size: 5.2vw; /* Escala de manera fluida según la pantalla */
+    font-weight: bold;
+    font-family: var(--fuente-principal);
+    color: rgba(255, 255, 255, 0.75); /* Blanco translúcido tipo cristal */
+    letter-spacing: 1.5px;
+    z-index: 3;
+    /* Múltiples sombras para dar profundidad, relieve húmedo y brillo */
+    text-shadow: 
+        0 1px 0 rgba(255, 255, 255, 0.4),
+        0 -1px 0 rgba(0, 0, 0, 0.2),
+        2px 3px 6px rgba(0, 86, 179, 0.25),
+        0 0 15px rgba(255, 255, 255, 0.6);
+    user-select: none;
+   
+}
+
+#barra {
+    width: 100%;
+    margin-top: 0;
+    height: 15%;
+}
+
+#tablabarra {
+    width: 100%;
+    height: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+#tablabarra td {
+    padding: 0 5px;
+    font-size: 1.1vw;
+    cursor: pointer;
+    text-align: center;
+    background-color: var(--color-falso-boton);
+    color: var(--color-texto);
+    border: 1px solid var(--color-borde);
+    transition: background-color 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#tablabarra td i.fa {
+    margin-right: 4px;
+    font-size: 0.9em;
+}
+
+#tablabarra td:hover {
+    background-color: var(--color-falso-boton-hover);
+}
+
+#barraInicio.botonBarraSeleccionada,
+#tablabarra td#barraInicio.botonBarraSeleccionada {
+    background-color: var(--color-tab-inicio) !important;
+    color: var(--color-blanco) !important;
+    font-weight: bold;
+}
+
+#barraContactar.botonBarraSeleccionada,
+#tablabarra td#barraContactar.botonBarraSeleccionada {
+    background-color: var(--color-tab-contactar) !important;
+    color: var(--color-blanco) !important;
+    font-weight: bold;
+}
+
+#barraSituacion.botonBarraSeleccionada,
+#tablabarra td#barraSituacion.botonBarraSeleccionada {
+    background-color: var(--color-tab-situacion) !important;
+    color: var(--color-blanco) !important;
+    font-weight: bold;
+}
+
+#barraClientes.botonBarraSeleccionada,
+#tablabarra td#barraClientes.botonBarraSeleccionada {
+    background-color: var(--color-tab-clientes) !important;
+    color: var(--color-blanco) !important;
+    font-weight: bold;
+}
+
+.botonBarraSeleccionada {
+    background-color: var(--color-primario) !important;
+    color: var(--color-blanco) !important;
+    font-weight: bold;
+}
+/* ==========================================================================
+   4. COMPONENTES COMUNES (TEXTOS, ICONOS Y FORMULARIOS)
+   ========================================================================== */
+.labelexplicacion {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+.icons {
+    max-width: 50px;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.icons:hover {
+    transform: scale(1.1);
+}
+
+#contactoTabla, 
+#clientesTabla {
+    width: 100%;
+    max-width: 400px;
+}
+
+#contactoTabla td, 
+#clientesTabla td {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 5px 0;
+}
+
+#contactoTabla input, 
+#clientesTabla input, 
+#contactoConsulta {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#contactoConsulta {
+    height: 150px;
+}
+
+#logginboton {
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   5. PANEL INICIO Y BLOQUES DE SERVICIO (CONTROLADOS POR JQUERY)
+   ========================================================================== */
+#panelInicioInt {
+    position: relative;
+    overflow: hidden;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.bloque-servicio {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 10px;
+    display: none;
+    top: 50%;
+    left: 0;
+    margin-top: -80px; /* Ajusta este margen negativo según la altura de tus bloques para clavarlo en el centro exacto */
+}
+
+.bloque-servicio.activo {
+    display: block;
+}
+/* Tamaños adaptativos para imagen y texto */
+.bloque-servicio img {
+    width: 25%;
+    max-width: 120px;
+    height: auto;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.bloque-servicio .labelexplicacion {
+    width: 75%;
+    max-width: 600px;
+    margin: 10px auto;
+    text-align: justify;
+    font-size: 1rem;
+}
+
+#panelInicioInt table.table {
+    width: 80% !important;
+    margin: 0 auto 20px auto;
+    border: none !important; /* Quita el borde exterior si lo hay */
+}
+
+/* Esta regla extra asegura que las celdas internas tampoco pinten la línea superior */
+#panelInicioInt table.table th,
+#panelInicioInt table.table td {
+    border-top: none !important;
+    border: none !important;
+}
+/* ==========================================================================
+   6. OTROS PANELES (CONTACTAR, SITUACIÓN, ÁREA CLIENTES)
+   ========================================================================== */
+#panelContactarInt {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+#panelContactarInt .labelexplicacion {
+    color: var(--color-texto);
+    background-color: var(--color-blanco);
+    padding: 18px 22px;
+    border-radius: 8px;
+    border-left: 4px solid var(--color-tab-contactar);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    font-size: 1rem;
+}
+
+.contenedor-formulario {
+    background-color: var(--color-blanco);
+    padding: 25px 30px;
+    border-radius: 8px;
+    border: 1px solid var(--color-borde);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.grupo-campo label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #444444;
+}
+
+.grupo-campo input,
+.grupo-campo textarea {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background-color: #fafafa;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.grupo-campo input:focus,
+.grupo-campo textarea:focus {
+    outline: none;
+    border-color: var(--color-tab-contactar);
+    background-color: var(--color-blanco);
+    box-shadow: 0 0 0 3px rgba(113, 150, 38, 0.15);
+}
+
+.grupo-campo textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.contenedor-boton {
+    text-align: center;
+    margin-top: 10px;
+}
+
+#panelContactar #logginboton {
+    background-color: var(--color-tab-contactar);
+    color: var(--color-blanco);
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    width: 100%;
+    transition: background-color 0.2s ease;
+}
+
+#panelContactar #logginboton:hover {
+    background-color: #59771e;
+}
+
+#panelSituacionInt {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.tarjeta-situacion {
+    background-color: var(--color-blanco);
+    padding: 25px 30px;
+    border-radius: 8px;
+    border: 1px solid var(--color-borde);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    text-align: left;
+    border-left: 4px solid var(--color-tab-situacion);
+}
+
+.tarjeta-situacion h2 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 22px;
+    color: var(--color-tab-situacion);
+}
+
+.grid-informacion {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eeeeee;
+}
+
+.info-bloque strong {
+    display: block;
+    color: #333333;
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.info-bloque p {
+    margin: 0;
+    font-size: 14px;
+    color: #666666;
+}
+
+.contenedor-mapa {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid var(--color-borde);
+    background-color: #e5e3df;
+}
+
+#mapIframe {
+    width: 100%;
+    height: 300px;
+    border: 0;
+    display: block;
+}
+
+#panelAreaClientesInt {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 10px;
+    width: 100%;
+}
+
+.tarjeta-login {
+    background-color: var(--color-blanco);
+    width: 100%;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--color-borde);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.login-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 22px;
+    color: var(--color-tab-clientes);
+}
+
+.tarjeta-login #logginboton {
+    width: 100%;
+    background-color: var(--color-tab-clientes);
+    color: var(--color-blanco);
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.tarjeta-login #logginboton:hover {
+    background-color: #731800;
+}
+
+/* ==========================================================================
+   7. ANIMACIONES GENERALES DE ENTRADA
+   ========================================================================== */
+.fincas-animar {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    visibility: hidden; 
+}
+
+.fincas-animar.aparecer {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+/* ==========================================================================
+   8. PIE DE PÁGINA
+   ========================================================================== */
+#pie {
+    background-color: #333333;
+    color: var(--color-blanco);
+    height: 5vh;
+    padding: 0;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 5vh;
+    width: 100%;
+}
+
+#piecontenido {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#pietexto {
+    font-size: 1em;
+    padding-left: 0;
+    margin: 0;
+    flex: 0 0 50%;
+    max-width: 50%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    box-sizing: border-box;
+    padding-left: 15px;
+    visibility: hidden; /* Inicialmente oculto para evitar que interfiera con el diseño */
+}
+
+#pielegal {
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    padding-right: 15px;
+    padding-left: 0;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+    margin-left: 0;
+    margin-right: 0;
+    flex: 0 0 auto;
+}
+/* ==========================================================================
+   9. MEDIA QUERIES (RESPONSIVE)
+   ========================================================================== */
+@media (max-width: 600px) {
+    #tablabarra td .texto-boton {
+        display: none;
+    }
+    #tablabarra td i.fa {
+        margin-right: 0;
+        font-size: 3em;
+        padding: 2px;
+    }
+    #panelInicioInt .table img.icons,
+    table.fincas-animar img.icons,
+    img.icons {
+        max-width: 80px !important;
+        width: 100% !important;
+    }
+}
+@media (min-width: 768px) {
+    #panelPrincipal {
+        padding: 30px;
+    }
+    .labelexplicacion {
+        font-size: 1rem;
+    }
+    #mapIframe {
+        height: 450px;
+    }
+    #contactoTabla td, 
+    #clientesTabla td {
+        display: table-cell;
+        width: auto;
+    }
+    #contactoTabla td:first-child, 
+    #clientesTabla td:first-child {
+        text-align: right;
+        width: 30%;
+        padding-right: 15px;
+    }
+    #panelContactar #logginboton {
+        width: auto;
+        min-width: 180px;
+    }
+    .grid-informacion {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    #tablabarra td {
+        font-size: 16px;
+        padding: 5px;
+    }
+}
+
+@media (min-width: 1440px) {
+    #panelPrincipal {
+        max-width: 1400px;
+    }
+    .labelexplicacion {
+        font-size: 1rem;
+    }
+}
+
+/* ==========================================================================
+   AVISO DE COOKIES
+   ========================================================================== */
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333333;
+    color: #ffffff;
+    padding: 15px 20px;
+    z-index: 9999;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.cookie-contenido {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.cookie-contenido p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    flex: 1;
+    text-align: left;
+}
+
+#aceptarCookies {
+    background-color: var(--color-tab-contactar, #719626);
+    color: #ffffff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+#aceptarCookies:hover {
+    background-color: #59771e;
+}
+
+@media (max-width: 768px) {
+    .cookie-contenido {
+        flex-direction: column;
+        text-align: center;
+    }
+    .cookie-contenido p {
+        text-align: center;
+    }
+    #aceptarCookies {
+        width: 100%;
+    }
+}
+@media (pointer: coarse) {
+    /* 1. Forzar altura dinámica real en móviles para que el pie no quede oculto */
+    html, body, #cuerpo {
+        height: 100% !important;
+        height: 100dvh !important;
+    }
+
+    /* 2. Liberar el panel principal y permitir scroll fluido si el contenido pesa */
+    #panelPrincipal {
+        height: auto !important;
+        flex: 1 1 auto !important;
+        overflow-y: auto !important;
+    }
+
+    /* 3. Asegurar que el panel de inicio se centre de forma natural sin desbordarse */
+    #panelInicioInt {
+        height: auto !important;
+        min-height: 100% !important;
+        justify-content: flex-start !important;
+        padding: 20px 0 !important;
+    }
+
+    .bloque-servicio {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        margin-top: 0 !important;
+    }
+
+    /* 4. Garantizar que el pie mantenga su espacio fijo inferior visible */
+    #pie {
+        height: 45px !important;
+        flex: 0 0 45px !important;
+        position: relative !important;
+            }
+}

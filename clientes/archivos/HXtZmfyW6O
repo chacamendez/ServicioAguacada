@@ -1,0 +1,4593 @@
+////PROTOTYPE FUNCTIONS
+Function.prototype.nuevoMetodo = function(nombre, funcion) {
+    if (!this.prototype[nombre]) {
+        this.prototype[nombre] = funcion;
+        return this;
+    }
+}
+ 
+String.nuevoMetodo('trim', function(){
+    return this.replace(/^\s+|\s+$/g, '');
+});
+String.nuevoMetodo('replaceAt', function(index, char) {
+	if (!(isNaN(char))) char=char.toString(10);	
+	if (index==0) return char + this.substr(char.length);
+	else return this.substr(0, index) + char + this.substr(index+char.length);
+});
+
+
+////////////ARRAYS
+
+var listaObjetos= new Array("divTPVprincipal","divARTICULOSprincipal","divCOMPRASprincipal","divPROVEEDORESprincipal","divCLIENTESprincipal","divCIERRESprincipal","divCONFIGURACIONprincipal");
+var listaSubPanelArticulos= new Array ("divSubPanelArticulos","divSubPanelAdicional","divSubPanelAlergenos","divSubPanelCompras","divSubPanelSecciones","divSubPanelListado");
+var listaSubPanelClientes=new Array("divSubPanelClientes","divSubPanelTeclasComandas","divSubPanelListadoClientes");
+var listaSubPanelCompras=new Array ("divSubPanelListadoCompras","divSubPanelCompra");
+var listaSubPanelProveedores=new Array ("divSubPanelProveedores","divSubPanelListadoProveedores");
+var listaSubPanelConfiguracion=new Array ("divSubPanelConfiguracion","divSubPanelListados","divSubPanelImpuestos","divSubPanelUnidades","divSubPanelTeclasRapidas","divSubPanelIdiomas","divSubPanelBackup");
+
+///////////
+
+////////////GLOBALS
+
+var descuento=0;
+var imprimir=true;
+var challenge;
+var comandaSeleccionada=0;
+var listaImpresoras=new Array;
+var listaSettings=new Array;
+
+
+//////////FUNCTION UPLOAD
+
+function upclick(d){var g={element:null,action:"about:blank",action_params:{},maxsize:0,onstart:null,oncomplete:null,dataname:"Filedata",target:null,zindex:"auto"};for(var h in g)d[h]=d[h]?d[h]:g[h];var k=d.element;if(typeof k=="string")k=document.getElementById(k);var e=k.ownerDocument,b,c=e.createElement("div"),n="frame"+(new Date).getTime().toString().substr(8);c.innerHTML='<iframe name="'+n+'" src="about:blank" onload="this.onload_callback()"></iframe>';var i=c.childNodes[0];i.onload_callback=
+	function(){var a=e.createElement("form");c.appendChild(a);a.method="post";a.enctype="multipart/form-data";a.encoding="multipart/form-data";if(d.target){a.target=d.target;a.setAttribute("target",d.target)}else{a.target=n;a.setAttribute("target",n)}a.action=d.action;a.setAttribute("action",d.action);a.style.margin=0;a.style.padding=0;a.style.height="80px";a.style.width="40px";a.runat="server";var j=d.action_params;for(var p in j){var m=e.createElement("input");m.type="hidden";m.name=p;m.value=String(j[p]);
+	a.appendChild(m)}if(d.maxsize){j=e.createElement("input");j.type="hidden";j.name="MAX_FILE_SIZE";j.value=String(d.maxsize);a.appendChild(j)}b=e.createElement("input");b.name=d.dataname;b.type="file";b.size="1";b.runat="server";a.appendChild(b);b.style.position="absolute";b.style.display="block";b.style.top=0;b.style.left=0;b.style.height=a.style.height;b.style.width="80px";b.style.opacity=0;b.style.filter="alpha(opacity=0)";b.style.fontSize=8;b.style.zIndex=1;b.style.visiblity="hidden";b.style.marginLeft=
+	"-40px";var o=function(){if(b.value){var f=d.onstart;f&&f(b.value);a.submit()}};if(b.addEventListener)b.addEventListener("change",o,false);else if(b.attachEvent)b.attachEvent("onpropertychange",function(f){if(!f)f=window.event;f.propertyName=="value"&&o()});else b.onpropertychange=o;i.onload_callback=function(){var f=null;if(i.contentWindow)f=i.contentWindow;else if(i.contentDocument)f=i.contentDocument.defaultView;f=f.document.body.innerHTML;var q=d.oncomplete;q&&q(f);a.reset()}};i.style.display=
+	"none";i.width=0;i.height=0;i.marginHeight=0;i.marginWidth=0;e.body.insertBefore(c,e.body.firstChild);c.style.position="absolute";c.style.overflow="hidden";c.style.padding=0;c.style.margin=0;c.style.visiblity="hidden";c.style.width="0px";c.style.height="0px";if(d.zindex=="auto"){g=0;var l;for(h=k;h.tagName!="BODY";){l=h.currentStyle?h.currentStyle:getComputedStyle(h,null);l=parseInt(l.zIndex);l=isNaN(l)?0:l;g+=l+1;h=h.parentNode}c.style.zIndex=g}else c.style.zIndex=d.zindex;g=function(a){if(!a)a=
+	window.event;c.style.width="0px";c.style.height="0px";if(e.elementFromPoint(a.clientX,a.clientY)===k){c.style.width="40px";c.style.height="80px"}};if(c.addEventListener)c.addEventListener("mousemove",g,false);else c.attachEvent&&c.attachEvent("onmousemove",g);g=function(a){if(!a)a=window.event;var j=y=0;if(a.pageX)j=a.pageX;else if(a.clientX)j=a.clientX+(e.documentElement.scrollLeft?e.documentElement.scrollLeft:e.body.scrollLeft);if(a.pageY)y=a.pageY;else if(a.clientY)y=a.clientY+(e.documentElement.scrollTop?
+	e.documentElement.scrollTop:e.body.scrollTop);c.style.left=j-20+"px";c.style.top=y-40+"px";c.style.width="40px";c.style.height="80px"};if(k.addEventListener)k.addEventListener("mousemove",g,false);else k.attachEvent&&k.attachEvent("onmousemove",g)};
+
+
+////////////////////
+function abrirCaja(){
+	var divVisor=document.getElementById('labelTextoDivTPVprincipal');
+	var cambio=parseFloat(divVisor.innerHTML);
+	if (!(isNaN(cambio))) mostrarDialogoSiNo('Va usted a introducir ' +cambio+ ' euros en cambio. ¿Desea Continuar?','incluirCambio('+cambio+')');
+	limpiarObjeto(divVisor);
+	ejecutarAperturaCaja();
+}
+function actualizarDatosArticulos(){
+	var Objeto2=document.getElementById('divArticuloEditado');
+	Objeto2.style.display='none';
+	actualizarDatosUnidades();
+	actualizarDatosImpuestos();
+	actualizarDatosSecciones();
+	rellenarIdiomas();
+}
+function actualizarDatosCierres(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=CierresXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlCierres(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosIdiomas(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=IdiomasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDatosIdiomas(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosImpuestos() {
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ImpuestosXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlImpuestos(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosListadoArticulos(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ListadoArticulosXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlListadoArticulos(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosListadoClientes(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ClientesXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlClientes(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosListadoCompras(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ComprasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlListadoCompras(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosListadoProveedores(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ProveedoresXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlProveedores(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+	
+}
+function actualizarDatosMovimientosCaja(idCierre,pago){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	if (pago) xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=MovimientosCajaXML&pago=true",true);
+	else xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=MovimientosCajaXML&idCierre="+idCierre,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+			if (pago) {
+				parseXmlPagosCaja(xmlhttp.responseXML);
+				xmlhttp.send();
+				return;
+			}
+			if (idCierre==0) parseXmlMovimientosCajaTPV(xmlhttp.responseXML);
+			else parseXmlMovimientosCaja(xmlhttp.responseXML);
+		} 
+	}
+	xmlhttp.send();
+}
+function actualizarDatosSecciones(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=SeccionesXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlSecciones(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosAumentarTeclasRapidas(numeroPanel){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TeclasRapidasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDatosAumentarTeclasRapidas(xmlhttp.responseXML,numeroPanel);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosTeclasRapidas(numeroPanel){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TeclasRapidasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDatosTeclasRapidas(xmlhttp.responseXML,numeroPanel);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosTeclasComandas(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ClientesXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDatosTeclasComandas(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosTeclasComandasTPV(){
+		var xmlhttp;
+		xmlhttp=new XMLHttpRequest();
+		xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ClientesXML",true);
+		xmlhttp.onreadystatechange=function()  {
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDatosTeclasComandasTPV(xmlhttp.responseXML);
+		}
+		xmlhttp.send();
+	}
+function actualizarDatosTeclasRapidasTPV(numeroPanel){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TeclasRapidasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDatosTeclasRapidasTPV(xmlhttp.responseXML,numeroPanel);
+	}
+	xmlhttp.send();
+}
+function actualizarDatosTickets(idCierre){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	if (idCierre==undefined) {
+		xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TicketsXML",true);
+		xmlhttp.onreadystatechange=function()  {
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDatosTicketsTPV(xmlhttp.responseXML);
+		}
+		xmlhttp.send();
+	}
+	else {
+		xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TicketsXML&idCierre="+idCierre,true);
+		xmlhttp.onreadystatechange=function()  {
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDatosTicketsCierres(xmlhttp.responseXML);
+		}
+		xmlhttp.send();
+	}
+	
+}
+function actualizarDatosUnidades(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=UnidadesXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlUnidades(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarLabelTicket(numeroTicket){
+	var labelTicket=document.getElementById('labelDivTPVticket');
+	if (numeroTicket!=undefined) {
+		labelTicket.innerHTML="Ticket Editado nº: " + numeroTicket+ "<label "+
+		"onclick='prepararTPV()' style='float:right;cursor:pointer;font-family:\"Web Symbols\"'>-</label>";
+		labelTicket.setAttribute('mysqlId',numeroTicket);
+		return;
+	}
+	var query="SELECT id FROM tickets ORDER BY id DESC LIMIT 1";
+	var idTicket=enviarQuery(query,false);
+	idTicket=parseInt(idTicket)+1;
+	labelTicket.innerHTML="Ticket nº: " + idTicket;
+	labelTicket.removeAttribute('mysqlId');
+}
+function actualizarListados(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ListadosXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlListados(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarListadoImpresoras(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ListadoImpresoras",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlListadoImpresoras(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarSettings(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	var fecha=new Date().getTime();
+	xmlhttp.open("GET","./recursos/Settings.xml?cache=" + fecha,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlSettings(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function actualizarTotalTPV(){
+	var tablaArticulos=document.getElementById('tablaTPVArticulosBody');
+	if (tablaArticulos.rows.length==0){
+		var total=document.getElementById('labeldivTPVPanelTotalCantidad');
+		total.innerHTML='0';
+		return;
+	}
+	var cantidadTotal=0;
+	for (var i=0;i<tablaArticulos.rows.length;i++){
+		var row=tablaArticulos.rows[i];
+		var cellSubtotal=row.cells[3];
+		cantidadTotal=parseFloat(cellSubtotal.innerHTML)+cantidadTotal;
+	}
+	var total=document.getElementById('labeldivTPVPanelTotalCantidad');
+	if (descuento!=0) cantidadTotal=cantidadTotal-(cantidadTotal*descuento/100);
+	total.innerHTML=cantidadTotal.toFixed(2);
+	total.style.color="yellow";
+	document.getElementById('labeldivTPVPanelTotalDescripcion').innerHTML="TOTAL";
+	document.getElementById('labeldivTPVPanelTotalDescripcion').style.color="yellow";
+}
+function alCargar(){
+	obtenerChallenge();
+	actualizarListadoImpresoras();
+	cargarFechaHora();
+	cambiarPanelTeclasRapidasTPV(1);
+	document.getElementById('divTPVprincipal').style.display='block';
+	prepararTPV();
+	focalizarInputLectorCodigos();
+	rellenarComandasTPV();
+	actualizarSettings();
+	realizarBackup();
+}
+function anularTicket(){
+	var labelNumeroTicket=document.getElementById('labelNumeroTicketsDetalle');
+	if (labelNumeroTicket==null)return;
+	var labelTicketDetalleMarca=document.getElementById('labelTicketDetalleMarca');
+	if (labelTicketDetalleMarca!=null&&labelTicketDetalleMarca.innerHTML=='Devuelto'){
+		mostrarDialogoAdvertencia('No se puede devolver un ticket devuelto');
+		return;
+	}
+	if (labelTicketDetalleMarca!=null&&labelTicketDetalleMarca.innerHTML=='Anulado'){
+		var idTicket=labelNumeroTicket.getAttribute('mysqlId');
+		query="UPDATE tickets SET marca='' WHERE id=" +idTicket;
+		enviarQuery(query,false);
+		añadirStock(idTicket);
+		query="SELECT pago FROM tickets WHERE id=" + idTicket;
+		var tipoPago=enviarQuery(query,false);
+		if (tipoPago==1) return;
+		var total=document.getElementById('labelTotalTicketsDetalle').getAttribute('total');
+		query="SELECT ticket FROM movimientosCaja WHERE ticket="+idTicket;
+		var resultado=enviarQuery(query,false);
+		resultado=String.trim(resultado);
+		if (resultado!='') insertarMovimientoCaja(idTicket,total,undefined,"Cancelar Anular ticket nº:"+idTicket);
+		actualizarDatosTickets();
+		return;
+	}
+	var idTicket=labelNumeroTicket.getAttribute('mysqlId');
+	query="UPDATE tickets SET marca='Anulado' WHERE id=" +idTicket;
+	enviarQuery(query,false);
+	devolverStock(idTicket);
+	query="SELECT pago FROM tickets WHERE id=" + idTicket;
+	var tipoPago=enviarQuery(query,false);
+	if (tipoPago==1) return;
+	var total=document.getElementById('labelTotalTicketsDetalle').getAttribute('total');
+	query="SELECT ticket FROM movimientosCaja WHERE ticket="+idTicket;
+	var resultado=enviarQuery(query,false);
+	resultado=String.trim(resultado);
+	if (resultado!='')	insertarMovimientoCaja(idTicket,-total,undefined,"Anulación ticket nº:"+idTicket);
+ 	actualizarDatosTickets();
+}
+function anularTicketCierre(){
+	var labelNumeroTicket=document.getElementById('labelNumeroTicketsDetalle');
+	if (labelNumeroTicket==null)return;
+	var labelTicketDetalleMarcaCierres=document.getElementById('labelTicketDetalleMarcaCierres');
+	if (labelTicketDetalleMarcaCierres!=null&&labelTicketDetalleMarcaCierres.innerHTML=='Devuelto'){
+		mostrarDialogoAdvertencia('No se puede devolver un ticket devuelto');
+		return;
+	}
+	var fecha=devolverFechaHoraMysql(fecha);
+	if (labelTicketDetalleMarcaCierres!=null&&labelTicketDetalleMarcaCierres.innerHTML=='Anulado'){
+		var idTicket=labelNumeroTicket.getAttribute('mysqlId');
+		query="UPDATE tickets SET marca='' WHERE id=" +idTicket;
+		enviarQuery(query,false);
+		añadirStock(idTicket);
+		query="SELECT pago FROM tickets WHERE id=" + idTicket;
+		var tipoPago=enviarQuery(query,false);
+		if (tipoPago==1) return;
+		var total=document.getElementById('labelTotalTicketsDetalleCierres').getAttribute('total');
+		query="SELECT ticket FROM movimientosCaja WHERE ticket="+idTicket;
+		var resultado=enviarQuery(query,false);
+		resultado=String.trim(resultado);
+		if (resultado!=''){
+			var query="SELECT cierre FROM tickets WHERE id="+ idTicket;
+			var idCierre=enviarQuery(query,false);
+		query="INSERT INTO movimientosCaja (fecha_hora,cantidad,ticket,marca,cierre) VALUES ('" + fecha + "'," + total + "," + idTicket +",'Cancelar anular ticket nº:"+idTicket+"',"+idCierre+")";
+		}
+		enviarQuery(query,false);	
+ 		actualizarDatosTickets(idCierre);
+		return;
+	}
+	var idTicket=labelNumeroTicket.getAttribute('mysqlId');
+	query="UPDATE tickets SET marca='Anulado' WHERE id=" +idTicket;
+	enviarQuery(query,false);
+	devolverStock(idTicket);
+	query="SELECT pago FROM tickets WHERE id=" + idTicket;
+	var tipoPago=enviarQuery(query,false);
+	if (tipoPago==1) return;
+	var total=document.getElementById('labelTotalTicketsDetalleCierres').getAttribute('total');
+	query="SELECT ticket FROM movimientosCaja WHERE ticket="+idTicket;
+	var resultado=enviarQuery(query,false);
+	resultado=String.trim(resultado);
+	if (resultado!=''){
+		var query="SELECT cierre FROM tickets WHERE id="+ idTicket;
+		var idCierre=enviarQuery(query,false);
+		query="INSERT INTO movimientosCaja (fecha_hora,cantidad,ticket,marca,cierre) VALUES ('" + fecha + "',-" + total + "," + idTicket +",'Anulación ticket nº:"+idTicket+"',"+idCierre+")";
+		enviarQuery(query,false);
+	}	
+ 	actualizarDatosTickets(idCierre);
+}
+
+function asignarTeclaComanda(position,idCliente){
+	query="UPDATE clientes SET teclas=" + position + " WHERE id="+idCliente;
+	enviarQuery(query,false);
+	actualizarDatosTeclasComandas();
+}
+function asignarTeclaRapida(position,idArticulo,numPanel){
+	query="DELETE FROM teclasRapidas WHERE position=" + position;
+	enviarQuery(query,false);
+	if (idArticulo!=0){
+		query="INSERT INTO teclasRapidas (idArticulo,position) VALUES (" + idArticulo + "," + position + ")";
+		enviarQuery(query,false);
+	}
+	actualizarDatosTeclasRapidas(numPanel);
+}
+function añadirArticulosComanda(idComandas){
+	
+}
+function añadirArticuloCompras(objeto){
+	var idArticulo=objeto.getAttribute('mysqlid');
+	var articulo=objeto.cells[0].innerHTML;
+	var inputArticulosCompras=document.getElementById('inputArticulosCompras');
+	inputArticulosCompras.value=articulo;
+	inputArticulosCompras.setAttribute('mysqlId',idArticulo);
+}
+function añadirArticuloTPV(objeto,unidades){
+	switch (Object.prototype.toString.call(objeto)){
+	case '[object String]':
+		var idArticulo=objeto;
+		break;
+	default:
+		var idArticulo=objeto.getAttribute('mysqlid');
+	}
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=devolverDatosArticuloXML&articulo="+idArticulo,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) procesarAñadirArticuloTPV(xmlhttp.responseXML,unidades);
+	}
+	xmlhttp.send();
+}
+function añadirArticuloTPVCodigoBarras(idArticulo){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=devolverDatosArticuloXML&articulo="+idArticulo,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) procesarAñadirArticuloTPV(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function añadirDetalleTabla(nombreTabla,rowCabecera){
+	var rowCabeceraCompras=document.getElementById(rowCabecera);
+	var cajas=rowCabeceraCompras.cells[0].childNodes[0];
+	cajas=parseInt(cajas.value);
+	if (isNaN(cajas)) cajas=1;
+	var unidades=rowCabeceraCompras.cells[1].childNodes[0];
+	var unidades=parseInt(unidades.value);
+	if (isNaN(unidades)){
+		mostrarDialogoAdvertencia('Debe introducir un número válido de unidades');
+		return;
+	}
+	var articulo=rowCabeceraCompras.cells[2].childNodes[0];
+	var idArticulo=articulo.getAttribute('mysqlId');
+	if (idArticulo==null){
+		mostrarDialogoAdvertencia('Debe introducir un artículo válido');
+		return;
+	}
+	articulo=articulo.value;
+	var precio=rowCabeceraCompras.cells[3].childNodes[0];
+	var precio=parseFloat(precio.value);
+	if (isNaN(precio)){
+		mostrarDialogoAdvertencia('Debe introducir un precio válido');
+		return;
+	}
+	var impuesto=rowCabeceraCompras.cells[4].childNodes[0];
+	var impuesto=parseInt(impuesto.value);
+	if (isNaN(impuesto)){
+		impuesto=0;
+	}
+	var tablaDetalleCompras=document.getElementById(nombreTabla);
+	var row=tablaDetalleCompras.insertRow(-1);
+	cellCajas=row.insertCell(0);
+	cellUnidades=row.insertCell(1);
+	cellArticulos=row.insertCell(2);
+	cellPrecio=row.insertCell(3);
+	cellImpuesto=row.insertCell(4);
+	cellEliminar=row.insertCell(5);
+	
+	cellCajas.innerHTML=cajas;
+	cellUnidades.innerHTML=unidades;
+	cellArticulos.innerHTML=articulo;
+	cellArticulos.setAttribute('mysqlId',idArticulo);
+	cellPrecio.innerHTML=precio;
+	cellImpuesto.innerHTML=impuesto;
+	cellEliminar.innerHTML='<label style="float:right" class="eliminarTelefono" onclick="eliminarRow(this)">-</label>';
+	limpiarCamposTablaDetalleCompras();
+}
+function añadirNota(nota){
+	var idDetalle=document.getElementById('divNotas').getAttribute('mysqlIdDetalle');
+	if (nota==undefined){
+		var nota=document.getElementById('inputDivNotas').value;
+		nota=String.trim(nota);
+		if (nota=='') return;
+	}
+	var query="INSERT INTO notas (nota,idComandasDetalle) VALUES ('"+nota+"',"+idDetalle+")";
+	enviarQuery(query,false);
+	query="SELECT id FROM notas ORDER BY id DESC LIMIT 1";
+	var idNota=enviarQuery(query,false);
+	var articulosSeleccionados=document.getElementsByClassName('rowsArticulosDivComandaSeleccionado');
+	var articuloSeleccionado=articulosSeleccionados[0];
+	var tablaArticulosDivComanda=document.getElementById("tablaArticulosDivComanda"+comandaSeleccionada);
+	var row=tablaArticulosDivComanda.insertRow(articuloSeleccionado.rowIndex+1);
+	row.setAttribute('class','rowsArticulosDivComandaSuplementos');
+	row.setAttribute('id','rowNota'+idNota);
+	var cellVoid=row.insertCell(0);
+	var cellNota=row.insertCell(1);
+	var cellEliminarNota=row.insertCell(2);
+	cellNota.innerHTML=nota;
+	cellEliminarNota.setAttribute('class','labelEliminarTPVComandas');
+	funcion='mostrarDialogoSiNo("Va usted a eliminar esta nota de la comanda, ' +
+	'¿Desea Continuar?","eliminarNotaComandaTPV('+idNota+')")';
+	cellEliminarNota.setAttribute('onclick',funcion);
+	cellEliminarNota.innerHTML="-";
+}
+function añadirOpcion(selector,texto,valor ){
+	var opcion = document.createElement("OPTION");
+	opcion.text = texto;
+	opcion.value = valor;
+	selector.options.add(opcion);
+}
+function añadirTelefonoTabla(nombreTabla,rowCabecera){
+	var rowCabeceraTelefonos=document.getElementById(rowCabecera);
+	var cellTelefono=rowCabeceraTelefonos.cells[0];
+	var inputTelefono=cellTelefono.childNodes[0].value;
+	inputTelefono=String.trim(inputTelefono);
+	if (inputTelefono==''){
+		mostrarDialogoAdvertencia('Debe introducir un número de teléfono');
+		return;
+	}
+	var cellContacto=rowCabeceraTelefonos.cells[1];
+	var inputContacto=cellContacto.childNodes[0].value;
+	inputContacto=String.trim(inputContacto);
+	var cellTipo=rowCabeceraTelefonos.cells[2];
+	var inputTipo=cellTipo.childNodes[0].value;
+	inputTipo=String.trim(inputTipo);
+	
+	cellTelefono.childNodes[0].value='';
+	cellContacto.childNodes[0].value='';
+	cellTipo.childNodes[0].value='';
+	
+	var tablaTelefonos=document.getElementById(nombreTabla);
+	var row=tablaTelefonos.insertRow(-1);
+	cellTelefono=row.insertCell(0);
+	cellContacto=row.insertCell(1);
+	cellTipo=row.insertCell(2);
+	
+	cellTelefono.innerHTML=inputTelefono;
+	cellContacto.innerHTML=inputContacto;
+	cellTipo.innerHTML=inputTipo+'<label style="float:right" class="eliminarTelefono" onclick="eliminarRow(this)">-</label>';
+	
+	inputTelefono='';
+}
+function añadirStock(idTicket){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TicketDetalleXML&idTicket="+idTicket,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlAñadirStock(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function botonBorrarLabelTPV(){
+	objeto=document.getElementById('labelTextoDivTPVprincipal');
+	var cadena=objeto.innerHTML;
+	objeto.innerHTML=cadena.substr(0,(cadena.length-1))
+	
+}
+
+function buscarCoincidenciasArticulos(numPanel,filtro) {
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	var input=document.getElementById(filtro);
+	focalizar(input);
+	input=String.trim(input.value);
+	if (input=='') xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ListadoArticulosXML",true);
+	else xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ListadoArticulosXML&articulo=" + input + "&like=1",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+			var xmlDoc;
+			xmlDoc=xmlhttp.responseXML;
+			if (document.getElementById('divTPVprincipal').style.display=='block') parseXmlRellenaTablaArticulosTPV(xmlhttp.responseXML);
+			if (document.getElementById('divARTICULOSprincipal').style.display=='block') parseXmlListadoArticulos(xmlhttp.responseXML);
+			if (document.getElementById('divCOMPRASprincipal').style.display=='block') parseXmlListadoArticulosCompras(xmlhttp.responseXML)
+			if (document.getElementById('divCONFIGURACIONprincipal').style.display=='block') parseXmlRellenaTablaTeclasRapidas(xmlhttp.responseXML,numPanel);
+		}
+	}
+	xmlhttp.send();
+}
+function buscarCoincidenciasClientes(objeto){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	if (objeto==null){
+		xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ClientesXML",true);
+	}
+	else {
+		var input=document.getElementById(objeto);
+		focalizar(input);
+		input=String.trim(input.value);
+		xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ClientesXML&cliente=" + input,true);
+	}
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200){
+			if (document.getElementById('divTablaClientes').style.display=='none') parseXmlClientes(xmlhttp.responseXML);
+			else parseXmlRellenaTablaClientes(xmlhttp.responseXML);
+		} 
+	}
+	xmlhttp.send();
+}
+function buscarCoincidenciasClientesTPV(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	var input=document.getElementById('inputfiltroClientesTPV');
+	focalizar(input);
+	input=String.trim(input.value);
+	var selector=document.getElementById('selectorTablaClientesFiltroTPV');
+	switch (selector.value){
+		case 'dirección':
+			if (input.length==0) xmlhttp.open("GET","./PHP/funcionesXML&funcion=ClientesXML",true);
+			else xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ClientesXML&cliente=" + input + "&direccion=true",true);
+			break;
+		default :
+		if (input.length==0) xmlhttp.open("GET","./PHP/funcionesXML&funcion=ClientesXML",true);
+		else xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ClientesXML&cliente=" + input,true);
+	}
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaTablaClientesTPV(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function cambiarEstilo(Objeto,Estilo,Atributo){
+	Objeto.setAttribute(Atributo,Estilo);
+}
+function cambiarIdioma(idIdioma){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=IdiomasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlCambioIdiomas(xmlhttp.responseXML,idIdioma);
+	}
+	xmlhttp.send();
+}
+function cambiarImagenAlergeno(objeto){
+	var seleccionado=objeto.getAttribute("seleccionado");
+	if (seleccionado=="true") {
+		objeto.setAttribute("seleccionado","false");
+		objeto.style.opacity="0.4";
+	}
+	else {
+		objeto.setAttribute("seleccionado","true");
+		objeto.style.opacity="1";	
+	}
+}
+function cambiarOpcionListados(selector){
+	var valor=devolverIdSelector(selector);
+	if (valor=='BalanceCierres') document.getElementById('divFechasEstadisticasListados').style.display='block';
+	else document.getElementById('divFechasEstadisticasListados').style.display='none';
+}
+function cambiarPanelTeclasRapidas(numPanel){
+	var cabeceraTablaTeclasRapidas=document.getElementById('tablaConfiguracionTeclasRapidasCabecera');
+	for (var i in cabeceraTablaTeclasRapidas.rows){
+		var rowCabeceraTablaTeclasRapidas=cabeceraTablaTeclasRapidas.rows[i];
+		for (var j in rowCabeceraTablaTeclasRapidas.cells){
+			var celda=rowCabeceraTablaTeclasRapidas.cells[j];
+			if (j==(numPanel-1))	celda.setAttribute('class','cellTablaTeclasRapidasCabeceraSeleccionada');
+			else {
+				try {
+					celda.setAttribute('class','cellTablaTeclasRapidasCabecera');
+				}
+				catch (err){
+					continue;
+				}
+			}
+		}
+	}	
+	var tablaTeclasRapidas=document.getElementById('tablaTeclasRapidasBody');
+	for (var i in tablaTeclasRapidas.rows){
+		var rowTablaTeclasRapidas=tablaTeclasRapidas.rows[i];
+		for (var j in rowTablaTeclasRapidas.cells){
+			var celda=rowTablaTeclasRapidas.cells[j];
+			celda.innerHTML='';
+			try {
+				var position=celda.getAttribute('position');
+			}
+			catch (err){
+				continue;
+			}
+			position=position.replaceAt(0,numPanel);
+			celda.setAttribute('position',position);
+			celda.setAttribute('onclick','seleccionarArticuloTeclasRapidas(this,' + numPanel + ')');
+		}
+	}
+	actualizarDatosTeclasRapidas(numPanel);
+}
+function cambiarPanelAumentarTeclasRapidasTPV(numPanel){
+	var cabeceraTablaTeclasRapidas=document.getElementById('tablaAumentarTeclasRapidasCabecera');
+	var rowCabeceraTablaTeclasRapidas=cabeceraTablaTeclasRapidas.rows[0];
+	for (var j=0;j<=rowCabeceraTablaTeclasRapidas.cells.length-1;j++){
+		var celda=rowCabeceraTablaTeclasRapidas.cells[j];
+		var valor=j+1;
+		celda.setAttribute('onclick','cambiarPanelAumentarTeclasRapidasTPV('+valor+')');
+		if (j==(numPanel-1))  celda.setAttribute('class','cellTablaAumentarTeclasRapidasCabeceraSeleccionada');
+		else {
+			try {
+				celda.setAttribute('class','cellTablaAumentarTeclasRapidasCabecera');
+			}
+			catch (err){
+				continue;
+			}
+		}
+	}
+		
+	var tablaTeclasRapidas=document.getElementById('tablaAumentarTeclasRapidasBody');
+	for (var i in tablaTeclasRapidas.rows){
+		var rowTablaTeclasRapidas=tablaTeclasRapidas.rows[i];
+		for (var j in rowTablaTeclasRapidas.cells){
+			var celda=rowTablaTeclasRapidas.cells[j];
+			celda.innerHTML='';
+			try {
+				var position=celda.getAttribute('position');
+			}
+			catch (err){
+				continue;
+			}
+			position=position.replaceAt(0,numPanel);
+			celda.setAttribute('position',position);
+			celda.setAttribute('onclick','añadirArticuloTPV(this)');
+		}
+	}
+	actualizarDatosAumentarTeclasRapidas(numPanel);
+}
+function cambiarPanelAumentarTeclasRapidas(numPanel){
+	var cabeceraTablaTeclasRapidas=document.getElementById('tablaAumentarTeclasRapidasCabecera');
+	var rowCabeceraTablaTeclasRapidas=cabeceraTablaTeclasRapidas.rows[0];
+	for (var j=0;j<=rowCabeceraTablaTeclasRapidas.cells.length-1;j++){
+		var celda=rowCabeceraTablaTeclasRapidas.cells[j];
+		var valor=j+1;
+		celda.setAttribute('onclick','cambiarPanelAumentarTeclasRapidas('+valor+')');
+		if (j==(numPanel-1))	celda.setAttribute('class','cellTablaAumentarTeclasRapidasCabeceraSeleccionada');
+		else {
+			try {
+				celda.setAttribute('class','cellTablaAumentarTeclasRapidasCabecera');
+			}
+			catch (err){
+				continue;
+			}
+		}
+	}
+		
+	var tablaTeclasRapidas=document.getElementById('tablaAumentarTeclasRapidasBody');
+	for (var i in tablaTeclasRapidas.rows){
+		var rowTablaTeclasRapidas=tablaTeclasRapidas.rows[i];
+		for (var j in rowTablaTeclasRapidas.cells){
+			var celda=rowTablaTeclasRapidas.cells[j];
+			celda.innerHTML='';
+			try {
+				var position=celda.getAttribute('position');
+			}
+			catch (err){
+				continue;
+			}
+			position=position.replaceAt(0,numPanel);
+			celda.setAttribute('position',position);
+			celda.setAttribute('onclick','seleccionarArticuloTeclasRapidas(this,' + numPanel + ')');
+		}
+	}
+	actualizarDatosAumentarTeclasRapidas(numPanel);
+}
+function cambiarPanelTeclasRapidasTPV(numPanel){
+	var cabeceraTablaTeclasRapidas=document.getElementById('TPVtablaTeclasRapidasCabecera');
+	for (var i in cabeceraTablaTeclasRapidas.rows){
+		var rowCabeceraTablaTeclasRapidas=cabeceraTablaTeclasRapidas.rows[i];
+		for (var j in rowCabeceraTablaTeclasRapidas.cells){
+			var celda=rowCabeceraTablaTeclasRapidas.cells[j];
+			if (j==(numPanel-1))	celda.setAttribute('class','cellTPVtablaTeclasRapidasSeleccionada');
+			else {
+				try {
+					celda.setAttribute('class','cellTPVtablaTeclasRapidasCabecera');
+				}
+				catch (err){
+					continue;
+				}
+			}
+		}
+	}	
+	var tablaTeclasRapidas=document.getElementById('TPVtablaTeclasRapidasBody');
+	for (var i in tablaTeclasRapidas.rows){
+		var rowTablaTeclasRapidas=tablaTeclasRapidas.rows[i];
+		for (var j in rowTablaTeclasRapidas.cells){
+			var celda=rowTablaTeclasRapidas.cells[j];
+			celda.innerHTML='';
+			try {
+				var position=celda.getAttribute('position');
+			}
+			catch (err){
+				continue;
+			}
+			position=position.replaceAt(0,numPanel);
+			celda.setAttribute('position',position);
+		}
+	}
+	actualizarDatosTeclasRapidasTPV(numPanel);
+}
+function cancelarComanda(objeto){
+	
+	prepararTPV();
+}
+function cargarFechaHora(){
+	var fecha=new Date();
+	var segundos=fecha.getSeconds();
+	var minutos=fecha.getMinutes();
+	var horas=fecha.getHours();
+	var diaMes=fecha.getDate();
+	
+	var dia=fecha.getDay();
+	switch(dia)
+	{
+	case 0:
+		dia='Domingo';
+		break;
+	case 1:
+		dia='Lunes';
+		break;
+	case 2:
+		dia='Martes';
+		break;
+	case 3:
+		dia='Miércoles';
+		break;
+	case 4:
+		dia='Jueves';
+		break;
+	case 5:
+		dia='Viernes';
+		break;
+	case 6:
+		dia='Sábado';
+		break;
+	}
+	
+	var mes=fecha.getMonth();
+	switch(mes)
+	{
+	case 0:
+		mes='Enero';
+		break;
+	case 1:
+		mes='Febrero';
+		break;
+	case 2:
+		mes='Marzo';
+		break;
+	case 3:
+		mes='Abril';
+		break;
+	case 4:
+		mes='Mayo';
+		break;
+	case 5:
+		mes='Junio';
+		break;
+	case 6:
+		mes='Julio';
+		break;
+	case 7:
+		mes='Agosto';
+		break;
+	case 8:
+		mes='Septiembre';
+		break;
+	case 9:
+		mes='Octubre';
+		break;
+	case 10:
+		mes='Noviembre';
+		break;
+	case 11:
+		mes='Diciembre';
+		break;
+	}
+	var año=fecha.getFullYear();
+	var cadenaFecha=dia + ", " + diaMes + " de " + mes + " de " + año + " " + horas + ":" + minutos + ":" + segundos;
+	var labelFecha=document.getElementById('labelDivTPVfechaHora');
+	labelFecha.innerHTML=cadenaFecha;
+	setTimeout("cargarFechaHora()",1000);  
+}
+function cargarImagenArticulo (idImagen){
+	
+}
+function cargarListadoComandas(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ListadoComandasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlListadoComandas(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function comprobarNumero(numero){
+	if (isNaN(numero)){
+		return false;
+	}
+	return numero;
+}
+function comprobarVacio(cadena){
+	cadena=String.trim(cadena);
+	if (cadena=='')	return true;
+	return false;
+}
+function comprobarCodigoBarras(numero,objeto){
+	if (objeto==undefined)	var inputCodigoBarras=document.getElementById('inputDivTPV');
+	else var inputCodigoBarras=document.getElementById(objeto);
+	if (numero!=inputCodigoBarras.value.length) return;
+	var codigoBarras=inputCodigoBarras.value;
+	if (isNaN(codigoBarras)){
+		inputCodigoBarras.value='';	
+		return;
+	}
+	var divTPV=document.getElementById('divTPVprincipal');
+	if (divTPV.style.display!='none'){
+		var idArticulo=existeCodigoBarras(codigoBarras);
+		if (idArticulo) {
+			añadirArticuloTPVCodigoBarras(idArticulo);
+			inputCodigoBarras.value='';	
+			return;
+		}
+		else {
+			mostrarDialogoSiNo("Este artículo no existe. ¿Desea introducirlo?","insertarArticuloConCodigo('"+codigoBarras+"')");
+			inputCodigoBarras.value='';	
+			return;
+		}
+	}
+	else{
+		insertarTablaCodigoBarras(codigoBarras);
+	}
+	inputCodigoBarras.value='';	
+}
+function crearComandasDetalle(idComanda){
+	var query="DELETE FROM comandasDetalle WHERE idComanda="+idComanda;
+	enviarQuery(query,false);
+	var tablaArticulosTPV=document.getElementById('tablaTPVArticulosBody');
+	for (var i=0;i<tablaArticulosTPV.rows.length;i++){
+		var row=tablaArticulosTPV.rows[i];
+		var cellUnidades=row.cells[0];
+		var idArticulo=row.getAttribute('mysqlid');
+		var cellPrecio=row.cells[2];
+		var impuesto=row.getAttribute('tipo');
+		var tipoUnidades=row.getAttribute('unidad');
+		query="INSERT INTO comandasDetalle (unidades,idArticulo,idComanda) VALUES ('"+cellUnidades.innerHTML+
+		"',"+idArticulo+","+idComanda+")";
+		enviarQuery(query,true);
+	}
+	prepararTPV();
+}
+function crearTicketsDetalle(idTicket,editado){
+	if (editado){
+		devolverStock(idTicket);
+		var query="DELETE FROM ticketsDetalle WHERE ticket="+idTicket;
+		enviarQuery(query,false);
+	}
+	var tablaArticulosTPV=document.getElementById('tablaTPVArticulosBody');
+	for (var i=0;i<tablaArticulosTPV.rows.length;i++){
+		var row=tablaArticulosTPV.rows[i];
+		var cellUnidades=row.cells[0];
+		var idArticulo=row.getAttribute('mysqlid');
+		var cellPrecio=row.cells[2];
+		var impuesto=row.getAttribute('tipo');
+		var tipoUnidades=row.getAttribute('unidad');
+		var query="INSERT INTO ticketsDetalle (unidades,articulo,precio,impuesto,ticket,tipo_unidades) VALUES ('"+
+		cellUnidades.innerHTML+"',"+idArticulo+","+cellPrecio.innerHTML+","+impuesto+","+idTicket+",'"+tipoUnidades+"')";
+		enviarQuery(query,true);
+		query="UPDATE articulos,unidades SET stock=(stock-"+cellUnidades.innerHTML+") WHERE articulos.id="+idArticulo;
+		enviarQuery(query,true);
+	}
+}
+function crearTicketEfectivo(){
+	if (document.getElementById('tablaTPVArticulosBody').rows.length==0) return;
+	var fecha=devolverFechaHoraMysql();
+	var ticketEditado=document.getElementById('labelDivTPVticket').getAttribute('mysqlId');
+	var total=parseFloat(document.getElementById('labeldivTPVPanelTotalCantidad').innerHTML);
+	var ingreso=parseFloat(document.getElementById('labelTextoDivTPVprincipal').innerHTML);
+	if (!(isNaN(ingreso))&&ingreso!=0&&ingreso>total){
+		var cambio=ingreso-total;
+		document.getElementById('labeldivTPVPanelTotalDescripcion').innerHTML="CAMBIO";
+		document.getElementById('labeldivTPVPanelTotalCantidad').innerHTML=cambio.toFixed(2);
+		document.getElementById('labeldivTPVPanelTotalDescripcion').style.color="green";
+		document.getElementById('labeldivTPVPanelTotalCantidad').style.color="green";
+		
+	}
+	if (ticketEditado!=null){
+		var query="UPDATE tickets SET pago=0,descuento="+descuento+" WHERE id="+ticketEditado;
+		enviarQuery(query,true);
+		crearTicketsDetalle(ticketEditado,true);
+		insertarMovimientoCaja(ticketEditado,total,true);
+		prepararTPV();
+		setTimeout(function () {enviarCorreoTicket(ticketEditado);},10000);
+		return;
+	}
+	var query="INSERT INTO tickets(cliente,fechahora,cierre,usuario,pago,descuento) VALUES (0,'"+fecha+"',0,0,0,"+descuento+")";
+	enviarQuery(query,false);
+	query="SELECT id FROM tickets ORDER BY id DESC LIMIT 1";
+	var idTicket=enviarQuery(query,false);
+	var labelDivTPVComanda=document.getElementById('labelDivTPVComanda');
+	if (labelDivTPVComanda.style.display!='none') {
+		var idComanda=labelDivTPVComanda.getAttribute('mysqlId');
+		query="UPDATE comandas SET idTicket=" +idTicket+ " WHERE id=" + idComanda;
+		enviarQuery(query,false);
+	}
+	crearTicketsDetalle(idTicket);
+	insertarMovimientoCaja(idTicket,total);
+	prepararTPV();
+	setTimeout(function () {enviarCorreoTicket(idTicket);},10000);
+	if (!(imprimir)) return;
+	else mostrarTicket(idTicket,undefined,true);
+}
+function crearTicketTarjeta(){
+	if (document.getElementById('tablaTPVArticulosBody').rows.length==0) return;
+	var fecha=devolverFechaHoraMysql();
+	var ticketEditado=document.getElementById('labelDivTPVticket').getAttribute('mysqlId');
+	if (ticketEditado!=null){
+		var query="UPDATE tickets SET pago=1,descuento="+descuento+" WHERE id="+ticketEditado;
+		enviarQuery(query,true);
+		var total=parseFloat(document.getElementById('labeldivTPVPanelTotalCantidad').innerHTML);
+		crearTicketsDetalle(ticketEditado,true);
+		insertarMovimientoCaja(ticketEditado,total,false);
+		prepararTPV();
+		setTimeout(function () {enviarCorreoTicket(ticketEditado);},10000);
+		return;
+	}
+	var query="INSERT INTO tickets(cliente,fechahora,cierre,usuario,pago,descuento) VALUES (0,'"+fecha+"',0,0,1,"+descuento+")";
+	enviarQuery(query,false);
+	query="SELECT id FROM tickets ORDER BY id DESC LIMIT 1";
+	var idTicket=enviarQuery(query,false);
+	var labelDivTPVComanda=document.getElementById('labelDivTPVComanda');
+	if (labelDivTPVComanda.style.display!='none') {
+		var idComanda=labelDivTPVComanda.getAttribute('mysqlId');
+		query="UPDATE comandas SET idTicket=" +idTicket+ " WHERE id=" + idComanda;
+		enviarQuery(query,false);
+	}
+	crearTicketsDetalle(idTicket);
+	prepararTPV();
+	setTimeout(function () {enviarCorreoTicket(idTicket);},10000);
+	if (!(imprimir)) return;
+	else mostrarTicket(idTicket,undefined,true);
+}
+function devolverFechaMysql(fecha){
+	var now = new Date();
+	if (fecha!=null) now=new Date(fecha);
+	var meses=now.getMonth()+1;
+	return now.getFullYear() + "-" + meses + "-" + now.getDate();
+}
+function devolverFechaHoraMysql(fecha){
+	var now = new Date();
+	if (fecha!=null) now=new Date(fecha);
+	var meses=now.getMonth() + 1;
+	return now.getFullYear() + "-" + meses + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+}
+function devolverStock(idTicket){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TicketDetalleXML&idTicket="+idTicket,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDevolverStock(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function devolverStockCompra(idCompra){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=devolverDatosCompraXML&idCompra="+idCompra,false);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlDevolverStockCompra(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function devolverTicketCierre(){
+	var labelNumeroTicket=document.getElementById('labelNumeroTicketsDetalleCierres');
+	if (labelNumeroTicket==null)return;
+	var labelDevuelto=document.getElementById('labelTicketDetalleMarcaCierres');
+	if (labelDevuelto!=null){
+		mostrarDialogoAdvertencia('No se puede devolver un ticket devuelto');
+		return;
+	}
+	var idTicket=labelNumeroTicket.getAttribute('mysqlId');
+	query="UPDATE tickets SET marca='Devuelto' WHERE id=" +idTicket;
+	enviarQuery(query);
+	devolverStock(idTicket);
+	query="SELECT pago FROM tickets WHERE id=" + idTicket;
+	var tipoPago=enviarQuery(query,false);
+	if (tipoPago==1) return;
+	var total=document.getElementById('labelTotalTicketsDetalleCierres').getAttribute('total');
+	query="SELECT ticket FROM movimientosCaja WHERE ticket="+idTicket;
+	var resultado=enviarQuery(query,false);
+	resultado=String.trim(resultado);
+	if (resultado!='')	insertarMovimientoCaja(idTicket,-total,undefined,'Devolución ticket nº:'+idTicket);
+	query="SELECT cierre FROM movimientosCaja WHERE ticket="+idTicket;
+	var idCierre=enviarQuery(query,false);
+	idCierre=String.trim(idCierre);
+	actualizarDatosTickets(idCierre);
+}
+function devolverTicketTPV(){
+	var labelNumeroTicket=document.getElementById('labelNumeroTicketsDetalle');
+	if (labelNumeroTicket==null)return;
+	var labelDevuelto=document.getElementById('labelTicketDetalleMarca');
+	if (labelDevuelto!=null&&labelDevuelto.innerHTML=='Devuelto'){
+		mostrarDialogoAdvertencia('No se puede devolver un ticket devuelto');
+		return;
+	}
+	var idTicket=labelNumeroTicket.getAttribute('mysqlId');
+	query="UPDATE tickets SET marca='Devuelto' WHERE id=" +idTicket;
+	enviarQuery(query);
+	devolverStock(idTicket);
+	query="SELECT pago FROM tickets WHERE id=" + idTicket;
+	var tipoPago=enviarQuery(query,false);
+	if (tipoPago==1) return;
+	var total=document.getElementById('labelTotalTicketsDetalle').getAttribute('total');
+	query="SELECT ticket FROM movimientosCaja WHERE ticket="+idTicket;
+	var resultado=enviarQuery(query,false);
+	resultado=String.trim(resultado);
+	if (resultado!='')	insertarMovimientoCaja(idTicket,-total);
+	actualizarDatosTickets();
+}
+function devolverIdSelector(selector){
+	var index=selector.selectedIndex;
+	var id=selector.options[index].value;
+	return id;
+}
+function editarArticulo(){
+	var divEditado=document.getElementById('divArticuloEditado');
+	var mysqlId=divEditado.getAttribute('mysqlId');
+	if (mysqlId==null||mysqlId==undefined){
+		mostrarDialogoAdvertencia('Debe cargar un artículo para editar');
+		return
+	}
+	divEditado.style.display='block';
+
+	var Objeto=document.getElementById('divArticuloEditadoAlergenos');
+	Objeto.style.display='block';
+		
+	var Objeto=document.getElementById('divArticuloEditadoCodigos');
+	Objeto.style.display='block';
+		
+}
+function editarCliente(){
+	var divEditado=document.getElementById('divClienteEditado');
+	var mysqlId=divEditado.getAttribute('mysqlId');
+	if (mysqlId==null||mysqlId==undefined){
+		mostrarDialogoAdvertencia('Debe cargar un cliente para editar');
+		return
+	}
+	divEditado.style.display='block';
+	var objeto=document.getElementById('textoClienteEditado');
+	objeto.innerHTML='Cliente editado ';
+}
+function editarCompra(){
+	var divCompraEditado=document.getElementById('divCompraEditado');
+	var idCompra=divCompraEditado.getAttribute('mysqlId');
+	if (idCompra==null) {
+		mostrarDialogoAdvertencia('Debe cargar una compra para ser editada');
+		return;
+	}
+	divCompraEditado.style.display='block';
+}
+function editarIdioma(idIdioma){
+	var divEditado=document.getElementById('divIdiomasEditado');
+	var mysqlId=divEditado.setAttribute('mysqlId',idIdioma);
+	divEditado.style.display='block';
+	var objeto=document.getElementById('textoIdiomasEditado');
+	objeto.innerHTML='Idioma editado ';
+	var query="SELECT idioma FROM idiomas WHERE id="+idIdioma;
+	var idioma=enviarQuery(query,false,false);
+	idioma= decodeURI(idioma);
+	var inputIdioma=document.getElementById('inputIdioma');
+	inputIdioma.value=idioma;
+	query="SELECT nombreArchivo FROM archivos WHERE id=(SELECT idArchivo FROM idiomas WHERE id="+idIdioma+")";
+	var nombreArchivo=enviarQuery(query,false);
+	var imagenBanderas=document.getElementById('imagenBandera');
+	imagenBanderas.src="./recursos/"+nombreArchivo;
+	imagenBanderas.style.display='inline';
+}
+function editarImpuesto(idImpuesto,impuesto,tipo){
+	var Objeto=document.getElementById('divImpuestoEditado');
+	Objeto.setAttribute('MysqlID',idImpuesto);
+	Objeto.style.display='block';
+	Objeto=document.getElementById('textoImpuestoEditado');
+	Objeto.innerHTML='Impuesto editado: ' + impuesto;
+	var Objeto=document.getElementById('inputImpuesto');
+	Objeto.value=impuesto;
+	Objeto=document.getElementById('inputTipoImpuesto');
+	Objeto.value=tipo;
+}
+function editarProveedor(){
+	var divEditado=document.getElementById('divProveedorEditado');
+	var mysqlId=divEditado.getAttribute('mysqlId');
+	if (mysqlId==null||mysqlId==undefined){
+		mostrarDialogoAdvertencia('Debe cargar un proveedor para editar');
+		return
+	}
+	divEditado.style.display='block';
+	var objeto=document.getElementById('textoProveedorEditado');
+	objeto.innerHTML='Proveedor editado ';
+}
+function editarSeccion(idSeccion,seccion,orden){
+	var Objeto=document.getElementById('divSeccionEditada');
+	Objeto.setAttribute('MysqlID',idSeccion);
+	Objeto.style.display='block';
+	Objeto=document.getElementById('textoSeccionEditada');
+	Objeto.innerHTML='Seccion editada: ' + seccion;
+	var Objeto=document.getElementById('inputSeccion');
+	Objeto.value=seccion;
+	var Objeto=document.getElementById('inputOrdenSeccion');
+	Objeto.value=orden;
+}
+function editarUnidad(idUnidad,unidad){
+	var Objeto=document.getElementById('divUnidadesEditado');
+	Objeto.setAttribute('MysqlID',idUnidad);
+	Objeto.style.display='block';
+	Objeto=document.getElementById('textoUnidadesEditado');
+	Objeto.innerHTML='Unidad editada: ' + unidad;
+	var Objeto=document.getElementById('inputUnidad');
+	Objeto.value=unidad;
+}
+function editarSetting(labelSetting){
+	var divSettingEditado=document.getElementById('divSettingEditado');
+	var tablaSettings=document.getElementById('tablaSettings');
+	for (var i=0;i<tablaSettings.rows.length;i++){
+		var row=tablaSettings.rows[i];
+		if (row.cells[0].innerHTML==labelSetting) var rowIndex=i;
+	}
+	inputValorSetting=document.getElementById('inputValorSetting');
+	if (rowIndex==3) {
+		var selectorImpresoras=document.getElementById('selectorImpresoras');
+		inputValorSetting.value=selectorImpresoras.value;
+	} 
+	else inputValorSetting.value=tablaSettings.rows[rowIndex].cells[1].innerHTML;
+	divSettingEditado.setAttribute('rowIndex',rowIndex);
+	divSettingEditado.style.display='block';
+	textoSettingsEditado=document.getElementById('textoSettingEditado');
+	textoSettingsEditado.innerHTML='Ajuste editado: ' + labelSetting;
+	inputLabelSetting=document.getElementById('inputLabelSetting');
+	inputLabelSetting.value=tablaSettings.rows[rowIndex].cells[0].innerHTML;
+	rellenaListadoSettings();
+}
+function editarTicketTPV(){
+	var labelNumeroTicket=document.getElementById('labelNumeroTicketsDetalle');
+	if (labelNumeroTicket==null)return;
+	var labelMarca=document.getElementById('labelTicketDetalleMarca');
+	if (labelMarca!=null){
+		if (labelMarca.innerHTML=='Devuelto') {
+			mostrarDialogoAdvertencia('No se puede editar un ticket devuelto');
+			return;
+		}
+	}
+	document.getElementById('divListadoTickets').style.display='none';
+	var idTicket=labelNumeroTicket.getAttribute('mysqlId');
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TicketDetalleXML&idTicket="+idTicket,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlEditarTicket(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function efectuarCierreCaja(){
+	var fecha=devolverFechaHoraMysql();
+	var query="INSERT INTO cierres (fechahora) VALUES ('"+fecha+"')";
+	enviarQuery(query,false);
+	query="SELECT id FROM cierres ORDER BY id DESC LIMIT 1";
+	var idCierre=enviarQuery(query,false);
+	query="UPDATE tickets SET cierre=" + idCierre + " WHERE cierre=0";
+	enviarQuery(query,false);
+	query="UPDATE movimientosCaja SET cierre=" +idCierre+ " WHERE cierre=0";
+	enviarQuery(query,false);
+	enviarCorreoCierre(idCierre);
+}
+function eliminarArchivo(nombreArchivo){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=eliminarArchivo&nombreArchivo="+nombreArchivo,false)
+	xmlhttp.send();
+}
+function eliminarArticulo(){
+	var divEditado=document.getElementById('divArticuloEditado');
+	if (divEditado.style.display=='none') {
+		mostrarDialogoAdvertencia('Debe editar el artículo antes de eliminarlo');
+		return;
+	}
+	var idArticulo=divEditado.getAttribute('mysqlId');
+	var query="DELETE FROM articulos WHERE id="+idArticulo;
+	enviarQuery(query,false);
+	query="DELETE FROM idiomasDetalle WHERE idArticulo="+idArticulo;
+	enviarQuery(query,false);
+	query="DELETE FROM codigos  WHERE idArticulo="+idArticulo;
+	enviarQuery(query,false);
+	limpiarPanelArticulos();
+}
+function eliminarArticuloComandaTPV(idComandaDetalle){
+	var articulos=document.getElementsByClassName('rowsArticulosDivComandaSeleccionado');
+	var articuloAEliminar=articulos[0];
+	articuloAEliminar.parentNode.removeChild(articuloAEliminar);
+	var query="DELETE notas,comandasDetalle FROM notas,comandasDetalle WHERE "+
+	"notas.idComandasDetalle=comandasDetalle.id AND comandasDetalle.id="+idComandaDetalle;
+	enviarQuery(query);
+	query="DELETE comandasDetalle FROM comandasDetalle WHERE comandasDetalle.id="+idComandaDetalle;
+	enviarQuery(query);
+}
+function eliminarArticuloSuplementoComandaTPV(idComandaDetalle){
+	var articulos=document.getElementsByClassName('rowsArticulosDivComandaSuplementosSeleccionado');
+	var articuloAEliminar=articulos[0];
+	articuloAEliminar.parentNode.removeChild(articuloAEliminar);
+	var query="DELETE FROM comandasDetalle WHERE comandasDetalle.id="+idComandaDetalle;
+	enviarQuery(query);
+}
+function eliminarArticuloTPV(objeto){
+	objeto=objeto.previousSibling;
+	var subTotal=objeto;
+	objeto=objeto.previousSibling;
+	var precio=objeto;
+	objeto=objeto.previousSibling;
+	objeto=objeto.previousSibling;
+	var cantidad=objeto.innerHTML;
+	var row=objeto.parentNode;
+	var unidad=row.getAttribute('unidad');
+	if (cantidad==1||unidad!='Unidad'){
+		var tabla=row.parentNode;
+		tabla.removeChild(row);
+	}
+	else {
+		cantidad-=1;
+		objeto.innerHTML=cantidad;
+		var total=0;
+		total=cantidad*parseFloat(precio.innerHTML);
+		subTotal.innerHTML=total.toFixed(2);
+	}
+	actualizarTotalTPV();
+}
+function eliminarCliente(){
+	var divEditado=document.getElementById('divClienteEditado');
+	if (divEditado.style.display!='block'){
+		mostrarDialogoAdvertencia('Debe editar el cliente para ser eliminado');
+		return;
+	}
+	var mysqlId=divEditado.getAttribute('mysqlId');
+	var query="DELETE FROM telefonos WHERE origen='"+mysqlId+";Clientes'";
+	enviarQuery(query,false);
+	query="DELETE FROM clientes WHERE id="+ mysqlId;
+	enviarQuery(query,false);
+	divEditado.style.display='none';
+	divEditado.removeAttribute('mysqlId');
+	limpiarClientes();
+}
+function eliminarCodigoBarras(codigoBarras){
+	var query="DELETE FROM codigos WHERE codigo='"+codigoBarras+"'";
+	enviarQuery(query);
+	var tablaCodigos=document.getElementById('tablaCodigoBarrasBody');
+	for (var i=0;i<tablaCodigos.rows.length;i++){
+		var codigo=tablaCodigos.rows[i].cells[0].innerHTML;
+		if (codigo==codigoBarras)	tablaCodigos.deleteRow(i);
+	}
+}
+function eliminarComandaTPV(idComanda){
+	var query="DELETE notas,comandasDetalle,comandas FROM notas,comandasDetalle,comandas WHERE "+
+	"notas.idComandasDetalle=comandasDetalle.id AND comandasDetalle.idComanda=comandas.id AND comandas.id="+idComanda;
+	enviarQuery(query,false);
+	query="DELETE comandasDetalle,comandas FROM comandasDetalle,comandas WHERE comandasDetalle.idComanda=comandas.id"+ 
+	" AND comandas.id="+idComanda;
+	enviarQuery(query,false);
+	query="DELETE FROM comandas WHERE id="+idComanda;
+	enviarQuery(query,false);
+	document.getElementById('divComanda'+idComanda).style.display='none';
+	
+}
+function eliminarCompra(){
+	var divEditado=document.getElementById('divCompraEditado');
+	if (divEditado.style.display!='block'){
+		mostrarDialogoAdvertencia('Debe editar la compra para ser eliminada');
+		return;
+	}
+	var divPago=document.getElementById('divPagosCompras');
+	if (divPago.style.display=='block'){
+		mostrarDialogoAdvertencia('No se puede eliminar una compra asociada a un pago por caja');
+		return;
+	}
+	var idCompra=divEditado.getAttribute('mysqlId');
+	devolverStockCompra(idCompra);
+	var query= "DELETE FROM comprasDetalle WHERE idCompra="+ idCompra;
+	enviarQuery(query,false);
+	query="DELETE FROM compras WHERE id="+ idCompra;
+	enviarQuery(query,false);
+	limpiarCompras();
+}
+function eliminarIdioma(idIdioma){
+	var divEditado=document.getElementById('divIdiomasEditado');
+	if (divEditado.style.display!='block'){
+		mostrarDialogoAdvertencia('Debe editar el idioma antes de eliminarlo');
+		return;
+	}
+	var query="SELECT idArchivo FROM idiomas WHERE id="+ idIdioma;
+	var idArchivo=enviarQuery(query,false);
+	query="SELECT nombreArchivo FROM archivos WHERE id="+ idArchivo;
+	var nombreArchivo=enviarQuery(query,false);
+	eliminarArchivo(nombreArchivo);
+	query="DELETE FROM archivos WHERE id="+ idArchivo;
+	enviarQuery(query,false);
+	var query="DELETE FROM idiomas WHERE id="+ idIdioma;
+	enviarQuery(query,false);
+	actualizarDatosIdiomas();  
+}
+function eliminarImagenArticulo(){
+	document.getElementById('imagenArticulo').src="";
+}
+function eliminarImpuesto(impuesto){
+	var query="DELETE FROM impuestos WHERE impuesto='" + impuesto + "'";
+	enviarQuery(query);
+	actualizarDatosImpuestos();  
+}
+function eliminarMovimientoCaja(idMovimiento){
+	var query="DELETE FROM movimientosCaja WHERE id="+ idMovimiento;
+	enviarQuery(query,false);
+	actualizarDatosMovimientosCaja(0);
+}
+function eliminarNotaComandaTPV(idNota){
+	var query="DELETE FROM notas WHERE id="+ idNota;
+	enviarQuery(query,false);
+	var row=document.getElementById('rowNota'+idNota);
+	row.parentNode.removeChild(row);
+	
+}
+function eliminarPagoCompra(){
+	var divPago=document.getElementById('divPagosCompras');
+	var mysqlId=divPago.getAttribute('mysqlId');
+	if (isNaN(mysqlId)) return;
+	if (mysqlId==0) return;
+	var query="UPDATE movimientosCaja SET marca='pago' WHERE id=" + mysqlId;
+	enviarQuery(query,false);
+}
+function eliminarProveedor(){
+	var divEditado=document.getElementById('divProveedorEditado');
+	if (divEditado.style.display!='block'){
+		mostrarDialogoAdvertencia('Debe editar el proveedor para ser eliminado');
+		return;
+	}
+	var mysqlId=divEditado.getAttribute('mysqlId');
+	var query="SELECT idProveedor FROM COMPRAS WHERE idProveedor=" +mysqlId + " LIMIT 1";
+	var idProveedor=enviarQuery(query,false);
+	if (idProveedor==mysqlId){
+		mostrarDialogoAdvertencia('No se puede eliminar un proveedor registrado en compras');
+		return;
+	}
+	var query="DELETE FROM telefonos WHERE origen='"+mysqlId+";Proveedores'";
+	enviarQuery(query,false);
+	query="DELETE FROM proveedores WHERE id="+ mysqlId;
+	enviarQuery(query,false);
+	divEditado.style.display='none';
+	divEditado.removeAttribute('mysqlId');
+	limpiarProveedores();
+}
+function eliminarRow(objeto){
+	cell=objeto.parentNode;
+	row=cell.parentNode;
+	tabla=row.parentNode;
+	tabla.deleteRow(row.sectionRowIndex);
+}
+function eliminarSeccion(seccion){
+	var query="DELETE FROM secciones WHERE seccion='" + seccion + "'";
+	enviarQuery(query);
+	actualizarDatosSecciones();  
+}
+function eliminarSetting(){
+	var divSettingEditado=document.getElementById('divSettingEditado');
+	if (divSettingEditado.style.display=='none'){
+		mostrarDialogoAdvertencia('Debe editar el ajuste antes de eliminarlo');
+		return;
+	}
+	var rowIndex=divSettingEditado.getAttribute('rowIndex');
+	if (rowIndex<4) {
+		mostrarDialogoAdvertencia('Este ajuste no puede ser eliminado');
+		return;
+	} 
+	var tablaSettings=document.getElementById('tablaSettings');
+	tablaSettings.deleteRow(rowIndex);
+	rellenaListadoSettings();
+	ocultarElemento(divSettingEditado);
+}
+function eliminarUnidad(unidad){
+	var query="DELETE FROM unidades WHERE unidad='" + unidad + "'";
+	enviarQuery(query);
+	actualizarDatosUnidades();  
+}
+function ejecutarAperturaCaja(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ejecutarAperturaCaja",true);
+	xmlhttp.send();
+}
+function ejecutarRestauracion(){
+	objeto=document.getElementById('formRestaurarTPV');
+	objeto.submit();
+}
+function enviarCorreoCierre(idCierre){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=enviarCorreoCierreXML&idCierre="+ idCierre,true);
+	xmlhttp.send();
+}
+function enviarCorreoTicket(idTicket){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	//alert("../PHP/funcionesXML.php?funcion=enviarCorreoTicketXML&idTicket="+ idTicket);
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=enviarCorreoTicketXML&idTicket="+ idTicket,true);
+	xmlhttp.send();
+}
+function enviarQuery (query,metodo,decode){ //metodo true equivale a asincronico
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.responseText=null;
+	if (metodo==null||metodo==undefined) metodo=true;
+	if (decode==false) xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=query&query="+query+"&decode=false",metodo);
+	else xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=query&query="+query,metodo);
+	switch (metodo){
+		case false:
+			xmlhttp.send();
+			while (xmlhttp.responseText==null){
+				sleep(50);
+			}
+			return xmlhttp.responseText;
+		default:
+			xmlhttp.send();
+	}
+}
+function esDecimal(numero){
+	if (isNaN(numero)) return false;
+	numero+='';
+	var resultado=numero.match("[.]");
+	if (resultado==null) return false;
+	else return true;
+}
+function existeCodigoBarras(codigoBarras){
+	query="SELECT idArticulo FROM codigos WHERE codigo='"+codigoBarras+"'";
+	var respuesta=enviarQuery(query,false);
+	if (respuesta==0) return false;
+	else return respuesta;
+}
+function focalizar (objeto){
+	switch (Object.prototype.toString.call(objeto)){
+	case '[object String]':
+		var objeto=document.getElementById(objeto);
+	}
+	objeto.focus();
+}
+function focalizarInputLectorCodigos(){
+	if (document.getElementById('divTPVprincipal').style.display=='block' && 
+			document.getElementById('divTablaArticulosTeclasRapidas').style.display=='none'
+				&&document.getElementById('divTablaComandasTPV').style.display=='none'
+					&&document.getElementById('divLogin').style.display=='none'
+						&&document.getElementById('divNotas').style.display=='none') focalizar('inputDivTPV');
+						
+	setTimeout("focalizarInputLectorCodigos()",500);  
+}
+function generarListado(nombreObjeto){
+	var selector =document.getElementById(nombreObjeto);
+	if (selector.value=='BalanceCierres'){
+		var fechaInicio=document.getElementById('inputFechaInicioEstadisticas').value;
+		var fechaFin=document.getElementById('inputFechaFinEstadisticas').value;
+		fechaInicio=fechaInicio.replace(/\//g,"-");
+		fechaFin=fechaFin.replace(/\//g,"-");
+		window.open('./listados/BalanceCierres.php?fechaInicio='+fechaInicio+'&fechaFin='+fechaFin);
+	}
+	else window.open('./listados/'+selector.value+'.php');
+}
+function guardarAlergenos(idArticulo,editado){
+	var A=new Array();
+	for(i=1;i<15;i++){
+		var imagen=document.getElementById('alergeno'+i);
+		var valor=imagen.getAttribute('seleccionado');
+		if (valor=="true") A[i]=1;
+		else A[i]=0;
+	}
+	var query="SELECT idArticulo FROM alergenos WHERE idArticulo="+idArticulo;
+	var valor=enviarQuery(query,false);
+	valor=parseInt(valor);
+	if(isNaN(valor)) editado=false;
+	if (editado) query="UPDATE alergenos SET A1="+A[1]+", A2="+A[2]+", A3="+A[3]+", A4="+A[4]+", A5="+A[5]+", A6="+A[6]+", A7="+A[7]+", A8="+A[8]+", A9="+A[9]+", A10="+A[10]+", A11="+A[11]+", A12="+A[12]+", A13="+A[13]+",A14="+A[14]+" WHERE idArticulo="+idArticulo;
+	else  query="INSERT INTO alergenos(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,idArticulo) VALUES ("+A[1]+","+A[2]+","+A[3]+","+A[4]+","+A[5]+","+A[6]+","+A[7]+","+A[8]+","+A[9]+","+A[10]+","+A[11]+","+A[12]+","+A[13]+","+A[14]+","+idArticulo+")";
+	enviarQuery(query,false);
+}
+function guardarCamposIdiomas(idArticulo){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=IdiomasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlGuardarCamposIdiomas(xmlhttp.responseXML,idArticulo);
+	}
+	xmlhttp.send();
+}
+function guardarSettings(){
+	var tablaSettings=document.getElementById('tablaSettings');
+	var cadena="";
+	for (var i=0;i<tablaSettings.rows.length;i++){
+		if (i==3){
+			 cellSetting=tablaSettings.rows[i].cells[0].innerHTML;
+			 cellValor=document.getElementById('selectorImpresoras').value;
+		}
+		else {
+			var cellSetting=tablaSettings.rows[i].cells[0].innerHTML;
+			var cellValor=tablaSettings.rows[i].cells[1].innerHTML;
+		}
+		cadena+="&"+cellSetting+"="+cellValor;
+	}
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=guardarSettings"+cadena,true);
+	xmlhttp.send();
+}
+function imprimirDocumento(objeto){
+	var documento=document.getElementById(objeto).innerHTML;
+	jsPrintSetup.setPrinter(listaSettings[3]);
+	jsPrintSetup.setOption('marginTop', 0);
+   	jsPrintSetup.setOption('marginBottom', 0);
+   	jsPrintSetup.setOption('marginLeft', 2);
+   	jsPrintSetup.setOption('marginRight', 2);
+	window.frames['frameImprimirDocumento'].document.body.innerHTML=documento;
+	jsPrintSetup.setSilentPrint(1);
+	jsPrintSetup.setShowPrintProgress(false);
+	jsPrintSetup.printWindow(window.frames['frameImprimirDocumento']);
+}
+function imprimirCondicional(){
+	if (imprimir) {
+		var imagenImprimir=document.getElementById('imprimirSiNo');
+		imagenImprimir.src='./recursos/PrintNo.png';
+		imprimir=false;
+	}
+	else {
+		var imagenImprimir=document.getElementById('imprimirSiNo');
+		imagenImprimir.src='./recursos/Print.png';
+		imprimir=true;
+	}
+}
+function incluirCambio(cantidad){
+	if (isNaN(cantidad)) {
+		mostrarDialogoAdvertencia("Debe introducir una cantidad válida");
+		limpiarObjeto(divVisor);
+		return;
+	}
+	var divVisor=document.getElementById('labelTextoDivTPVprincipal');
+	insertarMovimientoCaja(0,cantidad,undefined,'Cambio');
+	limpiarObjeto(divVisor);
+	ejecutarAperturaCaja();
+}
+function incluirDescuento(){
+	var divVisor=document.getElementById('labelTextoDivTPVprincipal');
+	var dto=parseInt(divVisor.innerHTML);
+	limpiarObjeto(divVisor);
+	descuento=dto;
+	actualizarTotalTPV();
+}
+function iniciarTPV(){
+	window.opener=self;
+	window.open('index.html','null','toolbar=no,scrollbars=no,location=no,resizable=no,width='+
+	screen.width+',height='+(screen.height-100)+'230');
+	window.moveTo(0,0);
+	window.close();
+}
+function insertarArticulo() {
+	var articulo=document.getElementById('inputArticulo1').value;
+	var descripcion=document.getElementById('textareaDescripcionArticulo1').value;
+	var seccion=document.getElementById('selectorSeccionesArticulos');
+	var precio=document.getElementById('inputPrecioArticulo').value;
+	var unidades=document.getElementById('selectorUnidadesArticulos');
+	var impuesto=document.getElementById('selectorImpuestosArticulos');
+	var stock=document.getElementById('inputStockArticulo').value;
+	var imagen=document.getElementById('imagenArticulo').src;
+	var utiles=document.getElementById('inputUtilesArticulo').checked;
+	var vegetariano=document.getElementById('inputTipoArticulo').checked;
+	var activo=document.getElementById('inputActivoArticulo').checked;
+	
+	articulo=String.trim(articulo);
+	descripcion=String.trim(descripcion);
+	precio=String.trim(parseFloat(precio));  
+	seccion=devolverIdSelector(seccion);
+	unidades=devolverIdSelector(unidades);
+	impuesto=devolverIdSelector(impuesto);
+	stock=String.trim(parseInt(stock));
+	
+	if (!(precio=comprobarNumero(precio))){
+		precio=0;
+	}
+	if (!(stock=comprobarNumero(stock))){
+		stock=0;
+	}
+	if (comprobarVacio(articulo)){
+		mostrarDialogoAdvertencia('El campo artículo es obligatorio');
+		return;
+	}
+	if (imagen!='http://localhost/'){
+		var idImagen=insertarImagen();
+	}
+	else var idImagen=0;
+		
+	var Objeto2=document.getElementById('divArticuloEditado');
+	if (Objeto2.style.display!='none'){
+		var imagen=document.getElementById('imagenArticulo');
+		var idimagen=imagen.getAttribute('MysqlID');
+		var idArticulo=Objeto2.getAttribute('MysqlID');
+		var query="UPDATE articulos SET articulo='"+articulo+"',descripcion='"  + descripcion + "',precio="  + precio + 
+		",seccion="  + seccion + ",unidad="  + unidades + ", impuesto="  + impuesto + 
+		", stock="  + stock + ", imagen="  + idImagen + ", utiles="  + utiles + "," +
+		" vegetariano="  + vegetariano +", activo="  + activo +" WHERE id=" + idArticulo;
+		enviarQuery(query);
+		insertarCodigos(idArticulo);
+		guardarAlergenos(idArticulo,true);
+	}
+	else {
+		var query="INSERT INTO articulos (articulo,descripcion,precio,seccion,unidad,impuesto,stock,imagen,"+
+		"utiles,vegetariano,activo) VALUES ('" +articulo +"','"+descripcion + "'," + precio + "," + seccion + "," + 
+		unidades + "," + impuesto + "," + stock +"," + idImagen + "," + utiles + "," + vegetariano + "," + activo + ")";
+		enviarQuery(query,false);
+		query="SELECT id FROM articulos ORDER BY id DESC LIMIT 1";
+		var idArticulo=enviarQuery(query,false);
+		insertarCodigos(idArticulo);
+		guardarAlergenos(idArticulo);
+	}
+	guardarCamposIdiomas(idArticulo);
+	sleep(1500);
+	limpiarPanelArticulos();
+}
+function insertarArticuloConCodigo(codigoBarras){
+	limpiarPanelArticulos();
+	actualizarDatosArticulos();
+	var tablaCodigos=document.getElementById('tablaCodigoBarrasBody');
+	var row=tablaCodigos.insertRow(-1);
+	cellCodigo=row.insertCell(0);
+	cellEliminar=row.insertCell(1);
+	cellCodigo.innerHTML=codigoBarras;
+	cellEliminar.innerHTML='<label class="eliminarTelefono" onclick="eliminarRow(this)">-</label>';
+	var objeto=document.getElementById('labelopcionesprincipalesseleccionado');
+	cambiarEstilo(objeto,'labelopcionesprincipalesclick');
+	mostrarPrincipal('divARTICULOSprincipal',objeto);
+}
+function insertarCaracteres(cadena){
+	var visor=document.getElementById('labelTextoDivTPVprincipal');
+	visor.innerHTML+=cadena;
+}
+function insertarCodigos(idArticulo){
+	var tablaCodigos=document.getElementById('tablaCodigoBarrasBody');
+	for (var i=0;i<tablaCodigos.rows.length;i++){
+		var row=tablaCodigos.rows[i];
+		var codigo=row.cells[0].innerHTML;
+		query="INSERT INTO codigos (codigo,idArticulo) VALUES ('"+codigo+"','"+idArticulo+"')";
+		enviarQuery(query);
+	}
+}
+function insertarCodigoBarras(objeto){
+	if (objeto==undefined){
+		var inputCodigoBarras=document.getElementById('inputDivTPV');
+		if (inputCodigoBarras.value.length>13) {
+			inputCodigoBarras.value='';
+		}
+		if (inputCodigoBarras.value.length==8) setTimeout("comprobarCodigoBarras(8)",100);
+		if (inputCodigoBarras.value.length==13) setTimeout("comprobarCodigoBarras(13)",100);
+	}
+	else {
+		var inputCodigoBarras=document.getElementById(objeto);
+		if (inputCodigoBarras.value.length>13) {
+			inputCodigoBarras.value='';
+		}
+		if (inputCodigoBarras.value.length==8) setTimeout("comprobarCodigoBarras(8,'"+objeto+"')",100);
+		if (inputCodigoBarras.value.length==13) setTimeout("comprobarCodigoBarras(13,'"+objeto+"')",100);
+	}
+	
+}
+function insertarCliente(){
+	var cliente=document.getElementById('inputNombreCliente').value;
+	cliente=String.trim(cliente);
+	if (cliente=='') {
+		mostrarDialogoAdvertencia('Debe introducir un cliente');
+		return;
+	}
+	var direccion=document.getElementById('textAreaDireccionCliente').value;
+	var divEditado=document.getElementById('divClienteEditado');
+	if (divEditado.style.display=='block') editado=true;
+	else editado=false;
+	if (editado){
+		var idCliente=divEditado.getAttribute('mysqlId');
+		var query="UPDATE clientes SET cliente='" +cliente+ "',direccion='"+direccion+"' WHERE id="+idCliente;
+		enviarQuery(query);
+		var idTabla=idCliente +";Clientes";
+		query="DELETE FROM telefonos WHERE origen='"+ idTabla +"'";
+		enviarQuery(query);
+		divEditado.style.display='none';
+		divEditado.removeAttribute('mysqlId');
+	}
+	else {
+		var query="INSERT INTO clientes (cliente,direccion) VALUES('"+cliente+"','"+direccion+"')";
+		enviarQuery(query,false);
+		query="SELECT id FROM clientes ORDER BY id DESC LIMIT 1";
+		var idCliente=enviarQuery(query,false);
+		var idTabla=idCliente +";Clientes";
+	}
+	var tablaTelefonos=document.getElementById('tablaTelefonosClienteBody');
+	for (var i=0;i<tablaTelefonos.rows.length;i++){
+		var row=tablaTelefonos.rows[i];
+		var telefono=row.cells[0].innerHTML;
+		var contacto=row.cells[1].innerHTML;
+		var tipo=row.cells[2];
+		tipo=tipo.childNodes[0].nodeValue;
+		query="INSERT INTO telefonos (telefono,contacto,tipo,origen) VALUES ('"+telefono+"','"+contacto+
+		"','"+tipo+"','"+idTabla+"')";
+		enviarQuery(query);
+	}
+	limpiarClientes();
+}
+function insertarCompra(){
+		
+	var inputFactura=document.getElementById('inputFacturaCompras').value;
+	inputFactura=String.trim(inputFactura);
+	if (inputFactura==''){
+		mostrarDialogoAdvertencia('Debe introducir el número de la factura');
+		return;
+	}
+	var inputTotal=document.getElementById('inputTotalCompras');
+	var cantidad=String.trim(inputTotal.value);
+	if (isNaN(parseFloat(cantidad))){
+		mostrarDialogoAdvertencia('Debe introducir una cantidad total válida');
+		return;
+	}
+	var tablaDetalleCompra=document.getElementById('tablaDetallesComprasBody');
+	if (tablaDetalleCompra.rows.length==0){
+		mostrarDialogoAdvertencia('Debe introducir al menos un detalle de compra');
+		return;
+	}
+	var inputFecha=document.getElementById('inputFechaCompras').value;
+	inputFecha=devolverFechaMysql(inputFecha);
+	var selector=document.getElementById('selectorProveedorCompras');
+	var idProveedor=devolverIdSelector(selector);
+	
+	var divPagosCompras=document.getElementById('divPagosCompras');
+	if (divPagosCompras.style.display=='block'){
+		var idPago=divPagosCompras.getAttribute('mysqlId');
+	}
+	else idPago=0;
+	
+	if (!(isNaN(idPago)&&idPago!=0)){
+		var query="UPDATE movimientosCaja SET marca='Pago compra' WHERE id=" + idPago;
+		enviarQuery(query,false);
+	}
+	
+	var divEditado=document.getElementById('divCompraEditado');
+	if (divEditado.style.display=='block'){
+		var idCompra=divEditado.getAttribute('mysqlId');
+		var query="UPDATE compras SET idProveedor="+idProveedor+",idPago="+idPago+",factura='"+inputFactura+
+		"',fechaFactura='"+inputFecha+"',total="+cantidad+" WHERE id="+idCompra;
+		enviarQuery(query,false);
+		devolverStockCompra(idCompra);
+		query="DELETE FROM comprasDetalle WHERE idCompra="+idCompra;
+		enviarQuery(query,false);
+	}
+	else{
+		var query="INSERT INTO compras(idProveedor,idPago,fechaHora,factura,fechaFactura,total) VALUES ("+idProveedor+
+		","+idPago+",CURDATE(),'"+inputFactura+"','"+inputFecha+"',"+cantidad+")";
+		enviarQuery(query,false);
+		query="SELECT id FROM compras ORDER BY id DESC LIMIT 1";
+		var idCompra=enviarQuery(query,false);
+	}
+	
+	for (var i=0;i<tablaDetalleCompra.rows.length;i++){
+		var row=tablaDetalleCompra.rows[i];
+		var cajas=row.cells[0].innerHTML;
+		var unidades=row.cells[1].innerHTML;
+		var cantidad=cajas*unidades;
+		var cellArticulo=row.cells[2];
+		var idArticulo=cellArticulo.getAttribute('mysqlId');
+		var precio=row.cells[3].innerHTML;
+		var impuesto=row.cells[4].innerHTML;
+		query="INSERT INTO comprasDetalle (idCompra,idArticulo,cantidad,precio,tipoImpuesto) VALUES ("+idCompra+
+		","+idArticulo+","+cantidad+","+precio+","+impuesto+")";
+		enviarQuery(query);
+		query="UPDATE articulos,unidades SET stock=(stock %2B"+cantidad+") WHERE articulos.id="+idArticulo+
+		" AND articulos.unidad=unidades.id AND unidades.unidad='Unidad'";
+		enviarQuery(query);
+	}
+	limpiarCompras();
+}
+function insertarIdiomaArchivo(nombreArchivo){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	if (nombreArchivo==null) xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=insertarArchivo",false);
+	else xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=insertarArchivo&nombreArchivo="+nombreArchivo,false)
+	xmlhttp.send();
+	while (xmlhttp.responseText==null){
+		sleep(50);
+	}
+	return xmlhttp.responseText;
+}
+function insertarIdioma(){
+	var idioma=document.getElementById('inputIdioma').value;
+	idioma=String.trim(idioma);
+	if (idioma=='') {
+		mostrarDialogoAdvertencia('Debe introducir un nombre para el idioma');
+		return;
+	}
+	var imagenBandera=document.getElementById('imagenBandera');
+	var cadenaImagenBandera=String.trim(imagenBandera.src);
+	var cadena=cadenaImagenBandera.substr(cadenaImagenBandera.length-4,4);
+	if (cadena=='none') {
+		mostrarDialogoAdvertencia('Debe introducir una bandera para el idioma');
+		return;
+	}
+	var divEditado=document.getElementById('divIdiomasEditado');
+	if (divEditado.style.display=='block'){
+		var idIdioma=divEditado.getAttribute('mysqlId');
+		var query="SELECT idArchivo FROM idiomas WHERE id="+ idIdioma;
+		var idArchivo=enviarQuery(query,false);
+		query="SELECT nombreArchivo FROM archivos WHERE id="+idArchivo;
+		var nombreArchivo=enviarQuery(query,false);
+		var idArchivoNuevo=insertarIdiomaArchivo(nombreArchivo);
+		query="UPDATE idiomas SET idArchivo=" +idArchivoNuevo+ ",idioma='"+idioma+"' WHERE id="+ idIdioma;
+		enviarQuery(query,false);
+		query="DELETE FROM archivos WHERE id="+idArchivo;
+		enviarQuery(query,false);
+	}
+	else {
+		var idArchivo=insertarIdiomaArchivo();
+		var query="INSERT INTO idiomas (idioma,idArchivo) VALUES ('"+idioma+"',"+idArchivo+")";
+		enviarQuery(query,false);
+	}
+	actualizarDatosIdiomas();
+}
+function insertarImagen(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=insertarArchivo",false);
+	xmlhttp.send();
+	var i=0;
+	while (xmlhttp.responseText==null){
+		sleep(50);
+		if (i==10) break;
+		i++;
+	}
+	if (xmlhttp.responseText==null)	return 0;
+	else return xmlhttp.responseText;
+}
+function insertarImpuesto() {
+	var Objeto=document.getElementById('inputImpuesto');
+	var Objeto2=document.getElementById('inputTipoImpuesto');
+	if (isNaN(Objeto2.value)){
+		mostrarDialogoAdvertencia('Debe poner un tipo de impuesto numérico entre 0 y 99');
+		return;
+	}
+	var Objeto3=document.getElementById('divImpuestoEditado');
+	Objeto.value=String.trim(Objeto.value);
+	Objeto2.value=String.trim(Objeto2.value);
+	
+	if (Objeto3.style.display!='none'){
+		var idImpuesto=Objeto3.getAttribute('MysqlID');
+		var query="UPDATE impuestos SET impuesto='"  + Objeto.value + "',tipo=" + Objeto2.value + " WHERE id=" + idImpuesto;
+	}
+	else {
+		var query="INSERT INTO impuestos (impuesto,tipo) VALUES ('" + Objeto.value + "'," + Objeto2.value + ")";
+	}
+	enviarQuery(query);
+	actualizarDatosImpuestos();
+	Objeto.value="";
+	Objeto2.value="";
+	Objeto3.display='none'
+}
+function insertarMovimientoCaja(idTicket,cantidad,editado,marca){
+	if (editado){
+		var query="SELECT ticket FROM movimientosCaja WHERE ticket="+idTicket;
+		var resultado=enviarQuery(query,false);
+		resultado=String.trim(resultado);
+		if (resultado!='') {
+			var query="UPDATE movimientosCaja SET cantidad=" + cantidad + " WHERE ticket=" + idTicket;
+			enviarQuery(query,false);
+			return;
+		}
+	}
+	if (editado==false){
+		var query="DELETE FROM movimientosCaja WHERE ticket="+ idTicket;
+		enviarQuery(query,false);
+		return;
+	}
+	var fecha=devolverFechaHoraMysql(fecha);
+	if (marca==undefined) var query="INSERT INTO movimientosCaja (fecha_hora,cantidad,ticket) VALUES ('" + fecha + "'," + cantidad + "," + idTicket +
+	")";
+	else {
+		if (marca=='pago') var query="INSERT INTO movimientosCaja (fecha_hora,cantidad,ticket,marca,pago) VALUES ('" + fecha + "'," + cantidad + "," + idTicket +
+		",'"+marca+"',1)";
+		else var query="INSERT INTO movimientosCaja (fecha_hora,cantidad,ticket,marca) VALUES ('" + fecha + "'," + cantidad + "," + idTicket +
+		",'"+marca+"')";
+	}
+	enviarQuery(query,false);
+}
+function insertarPago(){
+	var divVisor=document.getElementById('labelTextoDivTPVprincipal');
+	var pago=parseFloat(divVisor.innerHTML);
+	limpiarObjeto(divVisor);
+	if (isNaN(pago)){
+		mostrarDialogoAdvertencia('Debe introducir la cantidad del pago');
+		return;
+	}
+	if (pago==0) {
+		mostrarDialogoAdvertencia('Debe introducir la cantidad del pago');
+		return;
+	}
+	insertarMovimientoCaja(0,-pago,undefined,'pago');
+}
+function insertarPagoCompras(idPago){
+	var objeto=document.getElementById('divPagosCompras');
+	objeto.childNodes[1].innerHTML='Pago por caja nº: '+ idPago;
+	objeto.setAttribute('mysqlId',idPago);
+	objeto.style.display='block';
+}
+function insertarProveedor(){
+	var proveedor=document.getElementById('inputProveedor').value;
+	proveedor=String.trim(proveedor);
+	if (proveedor=='') {
+		mostrarDialogoAdvertencia('Debe introducir un proveedor');
+		return;
+	}
+	var direccion=document.getElementById('textAreaDireccionProveedor').value;
+	var divEditado=document.getElementById('divProveedorEditado');
+	if (divEditado.style.display=='block') editado=true;
+	else editado=false;
+	if (editado){
+		var idProveedor=divEditado.getAttribute('mysqlId');
+		var query="UPDATE proveedores SET proveedor='" +proveedor+ "',direccion='"+direccion+"' WHERE id="+idProveedor;
+		enviarQuery(query);
+		var idTabla=idProveedor +";Proveedores";
+		query="DELETE FROM telefonos WHERE origen='"+ idTabla +"'";
+		enviarQuery(query);
+		divEditado.style.display='none';
+		divEditado.removeAttribute('mysqlId');
+	}
+	else {
+		var query="INSERT INTO proveedores (proveedor,direccion) VALUES('"+proveedor+"','"+direccion+"')";
+		enviarQuery(query,false);
+		query="SELECT id FROM proveedores ORDER BY id DESC LIMIT 1";
+		var idProveedor=enviarQuery(query,false);
+		var idTabla=idProveedor +";Proveedores";
+	}
+	var tablaTelefonos=document.getElementById('tablaTelefonosProveedorBody');
+	for (var i=0;i<tablaTelefonos.rows.length;i++){
+		var row=tablaTelefonos.rows[i];
+		var telefono=row.cells[0].innerHTML;
+		var contacto=row.cells[1].innerHTML;
+		var tipo=row.cells[2];
+		tipo=tipo.childNodes[0].nodeValue;
+		query="INSERT INTO telefonos (telefono,contacto,tipo,origen) VALUES ('"+telefono+"','"+contacto+
+		"','"+tipo+"','"+idTabla+"')";
+		enviarQuery(query);
+	}
+	limpiarProveedores();
+}
+function insertarSeccion() {
+	var Objeto=document.getElementById('inputSeccion');
+	var orden=document.getElementById('inputOrdenSeccion');
+	if (isNaN(orden.value)) orden.value=0;
+	var Objeto2=document.getElementById('divSeccionEditada');
+	Objeto.value=String.trim(Objeto.value);
+	
+	if (Objeto2.style.display!='none'){
+		var idSeccion=Objeto2.getAttribute('MysqlID');
+		var query="UPDATE secciones SET seccion='"  + Objeto.value + "',orden="+orden.value+" WHERE id=" + idSeccion;
+	}
+	else {
+		var query="INSERT INTO secciones (seccion,orden) VALUES ('" + Objeto.value + "',"+orden.value+")";
+	}
+	enviarQuery(query,true);
+	actualizarDatosSecciones();
+	Objeto2.style.display='none';
+	Objeto.value="";
+	orden.value="";
+}
+function insertarSetting(){
+	var labelSetting=document.getElementById('inputLabelSetting').value;
+	labelSetting=String.trim(labelSetting);
+	if (labelSetting=='') {
+		mostrarDialogoAdvertencia('Debe introducir un nombre para el ajuste');
+		return;
+	}
+	var valorSetting=document.getElementById('inputValorSetting').value;
+	valorSetting=String.trim(valorSetting);
+	if (valorSetting=='') {
+		mostrarDialogoAdvertencia('Debe introducir un valor para el ajuste');
+		return;
+	}
+	var divSettingEditado=document.getElementById('divSettingEditado');
+	var tablaSettings=document.getElementById('tablaSettings');
+	if (divSettingEditado.style.display=='none'){
+		var row=tablaSettings.insertRow(-1);
+		var cellLabel=row.insertCell(0);
+		var cellValor=row.insertCell(1);
+		var cellEditar=row.insertCell(2);
+		var cellEliminar=row.insertCell(3);
+		cellLabel.innerHTML=labelSetting;
+		cellValor.innerHTML=valorSetting;
+		cellEliminar.innerHTML="<label class=eliminarSetting>-</label>";
+		cellEditar.innerHTML="<label class=editarSetting>z</label>";
+		var texto="mostrarDialogoSiNo('Va usted a eliminar este setting. ¿Desea Continuar?','eliminarSetting(\"" +
+		labelSetting+ "\")')";
+		cellEliminar.setAttribute('onclick',texto);
+		texto="mostrarDialogoSiNo('Va usted a editar este setting. ¿Desea Continuar?','editarSetting(\"" +
+		labelSetting+ "\",\""+valorSetting+"\")')";
+		cellEditar.setAttribute('onclick',texto);
+		
+	}
+	else {
+		var rowIndex=divSettingEditado.getAttribute('rowIndex');
+		if (rowIndex>=4) tablaSettings.rows[rowIndex].cells[0].innerHTML=labelSetting;
+		 tablaSettings.rows[rowIndex].cells[1].innerHTML=valorSetting;
+	}
+	limpiarSettings();
+}
+function insertarTablaCodigoBarras(codigoBarras){
+	var tablaCodigos=document.getElementById('tablaCodigoBarrasBody');
+	var row=tablaCodigos.insertRow(-1);
+	cellCodigo=row.insertCell(0);
+	cellEliminar=row.insertCell(1);
+	cellCodigo.innerHTML=codigoBarras;
+	var funcion="mostrarDialogoSiNo('Va usted a eliminar este código de barras,¿Desea continuar?','eliminarCodigoBarras("+codigoBarras+")')"
+	cellEliminar.innerHTML='<label class="eliminarTelefono" onclick="'+funcion+'">-</label>';
+}
+function insertarUnidad() {
+	var Objeto=document.getElementById('inputUnidad');
+	var Objeto2=document.getElementById('divUnidadesEditado');
+	Objeto.value=String.trim(Objeto.value);
+	if (Objeto2.style.display!='none'){
+		var idUnidad=Objeto2.getAttribute('MysqlID');
+		var query="UPDATE unidades SET unidad='"  + Objeto.value + "' WHERE id=" + idUnidad;
+	}
+	else {
+		var query="INSERT INTO unidades (unidad) VALUES ('" + Objeto.value + "')";
+	}
+	
+	enviarQuery(query);
+	actualizarDatosUnidades();
+	Objeto2.style.display='none';
+	Objeto.value="";
+}
+function limpiarAlergenos(){
+	for (i=1;i<15;i++){
+		var alergeno=document.getElementById('alergeno'+i);
+		var seleccionado=alergeno.getAttribute('seleccionado');
+		if (seleccionado=="true") cambiarImagenAlergeno(alergeno);
+	}
+}
+function limpiarCamposCompra(){
+	var objeto=document.getElementById('inputFacturaCompras');
+	objeto.value='';
+	var objeto=document.getElementById('inputFechaCompras');
+	objeto.value='';
+	var objeto=document.getElementById('inputTotalCompras');
+	objeto.value='';
+}
+function limpiarCamposTablaDetalleCompras(){
+	var objeto=document.getElementById('inputCajasCompras');
+	objeto.value='';
+	var objeto=document.getElementById('inputUnidadesCompras');
+	objeto.value='';
+	var objeto=document.getElementById('inputArticulosCompras');
+	objeto.value='';
+	objeto.removeAttribute('mysqlId');
+	var objeto=document.getElementById('inputPrecioCompras');
+	objeto.value='';
+	var objeto=document.getElementById('inputTipoCompras');
+	objeto.value='';
+}
+function limpiarClientes(){
+	var objeto=document.getElementById('inputNombreCliente');
+	objeto.value='';
+	var objeto=document.getElementById('textAreaDireccionCliente');
+	objeto.value='';
+	var objeto=document.getElementById('inputTelefonoClientes');
+	objeto.value='';
+	var objeto=document.getElementById('inputContactoClientes');
+	objeto.value='';
+	var objeto=document.getElementById('inputTipoClientes');
+	objeto.value='';
+	var objeto=document.getElementById('tablaTelefonosClienteBody');
+	limpiarTabla(objeto);
+}
+function limpiarCompras(){
+	limpiarCamposCompra();
+	limpiarCamposTablaDetalleCompras();
+	var tablaCompras=document.getElementById('tablaDetallesComprasBody');
+	limpiarTabla(tablaCompras);
+	ocultarElemento('divCompraEditado');
+	ocultarElemento('divPagosCompras');
+	var divCompraEditado=document.getElementById('divCompraEditado');
+	divCompraEditado.removeAttribute('mysqlId');
+	var divPagosCompras=document.getElementById('divPagosCompras');
+	divPagosCompras.removeAttribute('mysqlId');
+}
+function limpiarIdiomas(){
+	var divEditado=document.getElementById('divIdiomasEditado');
+	divEditado.style.display='none';
+	divEditado.removeAttribute('mysqlId');
+	var inputIdioma=document.getElementById('inputIdioma');
+	inputIdioma.value='';
+	var imagenBandera=document.getElementById('imagenBandera');
+	imagenBandera.src='none';
+	imagenBandera.style.display='none';
+}
+function limpiarObjeto(objeto){
+	switch (Object.prototype.toString.call(objeto)){
+	case '[object String]':
+		var objeto=document.getElementById(objeto);
+		objeto.innerHTML='';
+		break;
+	default:
+		objeto.innerHTML='';
+	}
+}
+function limpiarPanelArticulos() {
+	var tablaInsertarArticulos=document.getElementById('tablaInsertarArticulos');
+	var inputs=tablaInsertarArticulos.getElementsByTagName('input');
+	for (var i in inputs){
+		inputs[i].value='';
+	}
+	var textareas=tablaInsertarArticulos.getElementsByTagName('textarea');
+	for (var i in textareas){
+		textareas[i].value='';
+	}
+	var objeto=document.getElementById('inputTipoArticulo');
+	objeto.checked=false;
+	var objeto=document.getElementById('inputActivoArticulo');
+	objeto.checked=true;
+	var objeto=document.getElementById('imagenArticulo');
+	objeto.src='';
+	
+	var objeto=document.getElementById('tablaCodigoBarrasBody');
+	while (objeto.rows.length!=0){
+		objeto.deleteRow(-1);
+	}
+	var objeto=document.getElementById('divArticuloEditado');
+	objeto.style.display='none';
+	
+	var objeto=document.getElementById('divArticuloEditadoCodigos');
+	objeto.style.display='none';
+	document.getElementById("imagenArticulo").src="";
+	
+	var objeto=document.getElementById('divArticuloEditadoAlergenos');
+	objeto.setAttribute('MysqlID','');
+	objeto.style.display='none';
+
+	limpiarAlergenos();
+}
+function limpiarProveedores(){
+	var objeto=document.getElementById('inputProveedor');
+	objeto.value='';
+	var objeto=document.getElementById('textAreaDireccionProveedor');
+	objeto.value='';
+	var objeto=document.getElementById('inputTelefonoProveedores');
+	objeto.value='';
+	var objeto=document.getElementById('inputContactoProveedores');
+	objeto.value='';
+	var objeto=document.getElementById('inputTipoProveedores');
+	objeto.value='';
+	var objeto=document.getElementById('tablaTelefonosProveedorBody');
+	limpiarTabla(objeto);
+}
+
+function limpiarSelector(selector){
+	while (selector.length!=0){
+		selector.remove(0);
+	}
+}
+function limpiarSettings(){
+	var inputLabelSetting=document.getElementById('inputLabelSetting');
+	inputLabelSetting.value='';
+	var inputValorSetting=document.getElementById('inputValorSetting');
+	inputValorSetting.value='';
+	ocultarElemento('divSettingEditado');
+}
+function limpiarTabla(tabla){
+	while(tabla.rows.length!=0) tabla.deleteRow(-1);
+}
+function limpiarTPVTablaArticulos(){
+	var tabla=document.getElementById('tablaTPVArticulosBody');
+	while (tabla.rows.length!=0){
+		tabla.deleteRow(-1); 
+	}
+}
+function loggin(){
+	var usuario=document.getElementById('usuario');
+	var clave=document.getElementById('clave');
+	
+	if (!usuario.value) {
+		mostrarDialogoAdvertencia('Debe introducir un usuario');
+		return;
+	}
+	if (!clave.value) {
+		mostrarDialogoAdvertencia('Debe introducir una clave');
+		return;
+	}
+	var claveChallenge=String.trim(clave.value + challenge);
+	var challengeMix=MD5(claveChallenge);
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=Loggin&usuario="+usuario.value+"&challenge="+challengeMix,false);
+	xmlhttp.send();
+	var i=0;
+	while (xmlhttp.responseText==null){
+		sleep(50);
+		if (i==10) break;
+		i++;
+	}
+	if (xmlhttp.responseText==null){
+		mostrarDialogoAdvertencia('Usuario o clave incorrecta');
+		return;
+	}
+	else {
+		if (xmlhttp.responseText==1)document.getElementById('divLogin').style.display='none';
+		else mostrarDialogoAdvertencia('Usuario o clave incorrecta');
+	}
+	obtenerChallenge();
+}
+function mostrarArticulosCompra(){
+	var objeto2=document.getElementById('divTablaArticulosTeclasRapidas');
+	objeto2.style.display='block';
+	buscarCoincidenciasArticulos(1,'inputfiltro');
+}
+function mostrarArticulosTPV(){
+	var objeto2=document.getElementById('divTablaArticulosTeclasRapidas');
+	objeto2.style.display='block';
+	buscarCoincidenciasArticulos(1,'inputfiltro');
+}
+function mostrarComanda(idComanda){
+	comandaSeleccionada=idComanda;
+	rellenarComandasTPV();
+	document.getElementById('celdaTPVarticulos').style.display='none';
+	var divCellComandas=document.getElementById('celdaTPVComandas').style.display='block';
+}
+function mostrarElemento(objeto){
+	switch (Object.prototype.toString.call(objeto)){
+	case '[object String]':
+		var objeto=document.getElementById(objeto);
+		objeto.style.display='block';
+		break;
+	default:
+		objeto.style.display='block';
+	}
+	
+}
+function mostrarCierreDetalle(idCierre){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=CierreDetalleXML&idCierre="+idCierre,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlMostrarCierreDetalle(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function mostrarDialogoAdvertencia(texto){
+	var objeto=document.getElementById('divDialogoAdvertencia');
+	objeto.style.display='block';
+	objeto=document.getElementById('textoPanelDialogoAdvertencia');
+	objeto.innerHTML=texto;
+	objeto=document.getElementById('botonAceptarDialogoAdvertencia');
+	objeto.setAttribute('onclick',"ocultarElemento('divDialogoAdvertencia')");
+}
+function mostrarDialogoSiNo(texto,funcion){
+	var objeto=document.getElementById('divDialogoSiNo');
+	objeto.style.display='block';
+	objeto=document.getElementById('textoPanelDialogoSiNo');
+	objeto.innerHTML=texto;
+	objeto=document.getElementById('botonAceptarDialogoSiNo');
+	objeto.setAttribute('onclick',"ocultarElemento('divDialogoSiNo');"+funcion);
+	objeto=document.getElementById('botonCancelarDialogoSiNo');
+	objeto.setAttribute('onclick',"ocultarElemento('divDialogoSiNo')");
+}
+function mostrarMovimientosCajaCierre(cierre){
+	if (cierre==undefined){
+		var tablaCierres=document.getElementById('tablaDivListadoCierresBody');
+		for (var i=0;i<tablaCierres.rows.length;i++){
+			var row=tablaCierres.rows[i];
+			var seleccion=row.getAttribute('class');
+			if (seleccion=='rowsListadoArticuloSeleccionado'){
+				var idCierre=row.cells[0].innerHTML;
+				break;
+			}
+		}
+		if (idCierre==undefined) return;
+		actualizarDatosMovimientosCaja(idCierre);
+	}	
+	else actualizarDatosMovimientosCaja(0,true);
+	var divMovimientosCaja=document.getElementById('divListadoMovimientosCajaCierres');
+	divMovimientosCaja.style.display='block';
+}
+function mostrarMovimientosCajaCompras(){
+	actualizarDatosMovimientosCaja(0,true);
+	var divMovimientosCaja=document.getElementById('divListadoMovimientosCajaCierres');
+	divMovimientosCaja.style.display='block';
+}
+function mostrarMovimientosCajaTPV(){
+	var divMovimientosCaja=document.getElementById('divListadoMovimientosCajaCierres');
+	divMovimientosCaja.style.display='block';
+	actualizarDatosMovimientosCaja(0);
+}
+function mostrarNotas(idArticulo,idDetalle){
+	var divNotas=document.getElementById('divNotas');
+	divNotas.style.display='block';
+	divNotas.setAttribute('mysqlIdArticulo',idArticulo);
+	divNotas.setAttribute('mysqlIdDetalle',idDetalle);
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=NotasXML&idArticulo="+idArticulo,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaNotas(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function mostrarOpcionesPrincipales(Objeto){
+	Objeto.innerHTML='h';
+	Objeto.setAttribute('onmousedown','ocultarOpcionesPrincipales(this)');
+	cambiarEstilo(Objeto,'mostrarOcultarOpcionesPrincipales','id');
+	var Obj=document.getElementById('divopcionesprincipales');
+	Obj.style.display='block';
+	
+}
+function mostrarPrincipal(nomObjeto,label){
+	ocultarTodosPrincipales();
+	var Objeto=document.getElementById(nomObjeto);
+	Objeto.style.display="block";
+	Objeto=document.getElementById('labelopcionesprincipalesseleccionado');
+	Objeto.setAttribute('class','labelopcionesprincipales');
+	Objeto.removeAttribute('id'); 
+	label.removeAttribute('class');
+	label.setAttribute('id','labelopcionesprincipalesseleccionado');
+}
+function mostrarSubArticulos(nomObjeto,label){
+	ocultarTodosArticulos();
+	var Objeto=document.getElementById(nomObjeto);
+	Objeto.style.display="block";
+	Objeto=document.getElementById('labelOpcionesArticulosSeleccionado');
+	Objeto.setAttribute('class','labelOpcionesArticulos');
+	Objeto.removeAttribute('id'); 
+	label.removeAttribute('class');
+	label.setAttribute('id','labelOpcionesArticulosSeleccionado');
+}
+function mostrarSubClientes(nomObjeto,label){
+	ocultarTodosClientes();
+	var Objeto=document.getElementById(nomObjeto);
+	Objeto.style.display="block";
+	Objeto=document.getElementById('labelOpcionesClientesSeleccionado');
+	Objeto.setAttribute('class','labelOpcionesClientes');
+	Objeto.removeAttribute('id'); 
+	label.removeAttribute('class');
+	label.setAttribute('id','labelOpcionesClientesSeleccionado');
+}
+function mostrarSubCompras(nomObjeto,label){
+	ocultarTodosCompras();
+	var Objeto=document.getElementById(nomObjeto);
+	Objeto.style.display="block";
+	Objeto=document.getElementById('labelOpcionesComprasSeleccionado');
+	Objeto.setAttribute('class','labelOpcionesCompras');
+	Objeto.removeAttribute('id'); 
+	label.removeAttribute('class');
+	label.setAttribute('id','labelOpcionesComprasSeleccionado');
+}
+function mostrarSubConfiguracion(nomObjeto,label){
+	ocultarTodosConfiguracion();
+	var Objeto=document.getElementById(nomObjeto);
+	Objeto.style.display="block";
+	Objeto=document.getElementById('labelOpcionesConfiguracionSeleccionado');
+	Objeto.setAttribute('class','labelOpcionesConfiguracion');
+	Objeto.removeAttribute('id'); 
+	label.removeAttribute('class');
+	label.setAttribute('id','labelOpcionesConfiguracionSeleccionado');
+}
+function mostrarSubProveedores(nomObjeto,label){
+	ocultarTodosProveedores();
+	var Objeto=document.getElementById(nomObjeto);
+	Objeto.style.display="block";
+	Objeto=document.getElementById('labelOpcionesProveedoresSeleccionado');
+	Objeto.setAttribute('class','labelOpcionesProveedores');
+	Objeto.removeAttribute('id'); 
+	label.removeAttribute('class');
+	label.setAttribute('id','labelOpcionesProveedoresSeleccionado');
+}
+function mostrarTeclasComandas(){
+	document.getElementById('divTablaComandasTPV').style.display='block';
+	actualizarDatosTeclasComandasTPV();
+}
+function mostrarTicket(ticketId,cierre,creandoTicket){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	if (cierre==undefined){
+		xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TicketDetalleXML&idTicket="+ticketId,true);
+		xmlhttp.onreadystatechange=function()  {
+			if (creandoTicket) {
+				if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlMostrarTicket(xmlhttp.responseXML,true);
+			}
+			else{
+				if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlMostrarTicket(xmlhttp.responseXML);
+			}
+			
+		}
+		xmlhttp.send();
+	}
+	else {
+		xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=TicketDetalleXML&idTicket="+ticketId,true);
+		xmlhttp.onreadystatechange=function()  {
+			
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlMostrarTicketCierres(xmlhttp.responseXML);
+		}
+		xmlhttp.send();
+	}
+	
+	
+}
+function mostrarTickets(){
+	document.getElementById('divListadoTickets').style.display='block';
+	actualizarDatosTickets();
+}
+function mostrarTicketsCierre(){
+	var tablaCierres=document.getElementById('tablaDivListadoCierresBody');
+	for (var i=0;i<tablaCierres.rows.length;i++){
+		var row=tablaCierres.rows[i];
+		var seleccion=row.getAttribute('class');
+		if (seleccion=='rowsListadoArticuloSeleccionado'){
+			var idCierre=row.cells[0].innerHTML;
+			break;
+		}
+	}
+	if (idCierre==undefined) return;
+	actualizarDatosTickets(idCierre);
+	var divTicketsCierres=document.getElementById('divListadoTicketsCierres');
+	divTicketsCierres.style.display='block';
+	
+}
+function obtenerChallenge(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ChallengeGenerator",false);
+	xmlhttp.send();
+	var i=0;
+	while (xmlhttp.responseText==null){
+		sleep(50);
+		if (i==10) break;
+		i++;
+	}
+	challenge=xmlhttp.responseText;
+}
+function ocultarDivComandasTPV(){
+	document.getElementById('celdaTPVComandas').style.display='none';
+	document.getElementById('celdaTPVarticulos').style.display='block';
+}
+function ocultarElemento(objeto) {
+	switch (Object.prototype.toString.call(objeto)){
+	case '[object String]':
+		var objeto=document.getElementById(objeto);
+		objeto.style.display='none';
+		break;
+	default:
+		objeto.style.display='none';
+	}
+}
+function ocultarOpcionesPrincipales(Objeto){
+	Objeto.innerHTML='j';
+	Objeto.setAttribute('onmousedown','mostrarOpcionesPrincipales(this)');
+	cambiarEstilo(Objeto,'mostrarOcultarOpcionesPrincipalesOff','id');
+	var Obj=document.getElementById('divopcionesprincipales');
+	Obj.style.display='none';
+}
+function ocultarTodosArticulos(){
+	for (var i=0; i<listaSubPanelArticulos.length; i++){
+		var nomObjeto=listaSubPanelArticulos[i];
+		var Objeto=document.getElementById(nomObjeto);
+		Objeto.style.display="none";
+	}
+}
+function ocultarTodosClientes(){
+	for (var i=0; i<listaSubPanelClientes.length; i++){
+		var nomObjeto=listaSubPanelClientes[i];
+		var Objeto=document.getElementById(nomObjeto);
+		Objeto.style.display="none";
+	}
+}
+function ocultarTodosCompras(){
+	for (var i=0; i<listaSubPanelCompras.length; i++){
+		var nomObjeto=listaSubPanelCompras[i];
+		var Objeto=document.getElementById(nomObjeto);
+		Objeto.style.display="none";
+	}
+}
+function ocultarTodosConfiguracion(){
+	for (var i=0; i<listaSubPanelConfiguracion.length; i++){
+		var nomObjeto=listaSubPanelConfiguracion[i];
+		var Objeto=document.getElementById(nomObjeto);
+		Objeto.style.display="none";
+	}
+}
+function ocultarTodosProveedores(){
+	for (var i=0; i<listaSubPanelProveedores.length; i++){
+		var nomObjeto=listaSubPanelProveedores[i];
+		var Objeto=document.getElementById(nomObjeto);
+		Objeto.style.display="none";
+	}
+}
+function ocultarTodosPrincipales(){
+	for (var i=0; i<listaObjetos.length; i++){
+		var nomObjeto=listaObjetos[i];
+		var Objeto=document.getElementById(nomObjeto);
+		Objeto.style.display="none";
+	}
+}
+function parseXmlAñadirArticulo(XMLdocument,unidades){
+	if (unidades==undefined){
+		var textoDisplay=document.getElementById('labelTextoDivTPVprincipal').innerHTML;
+		textoDisplay=textoDisplay.trim();
+		if (textoDisplay=='') textoDisplay=1;
+		if (isNaN(textoDisplay)){
+			var resultado=null;
+			var resultado=textoDisplay.match("[*]");
+			if (resultado!=null){
+				switch (resultado.length){
+					case 0:
+						return;
+					case 1:
+						break;
+					default:
+						return;
+				}
+			}
+			var indexAst=textoDisplay.indexOf("*");
+			if (indexAst==0) return;
+			resultado=textoDisplay.split("*");
+			cantidad=resultado[0];
+			resultado[1]=String.trim(resultado[1]);
+			if (resultado[resultado.length-2]=' ') {
+				if (isNaN(resultado[0])) return;
+			}
+			else {
+				if (esDecimal(numero[1])) return;
+				codigoBarras=resultado[1];
+			}
+		}
+		else {
+			cantidad=textoDisplay;
+		}
+	}
+	else cantidad=unidades;
+	tablaArticulos=document.getElementById('tablaTPVArticulosBody');
+	var articulo=XMLdocument.getElementsByTagName('articulo');
+	var tipo=articulo[0].childNodes[5].getAttribute('tipo');
+	var tipoUnidad=articulo[0].childNodes[2].getAttribute('tipo');
+	var MysqlId=articulo[0].getAttribute('id');
+	if (esDecimal(cantidad)){
+		esEntero=false;
+		if (tipoUnidad=='Unidad') return;
+	}
+	else esEntero=true;
+	
+	for (var i=0;i<tablaArticulos.rows.length;i++){
+		var row=tablaArticulos.rows[i];
+		var id=row.getAttribute('MysqlId');
+		if (id==MysqlId){
+			var cellCantidad=row.cells[0];
+			if (esDecimal(cantidad)){
+				cantidad=parseFloat(cantidad);
+				var anteriorCantidad=parseFloat(cellCantidad.innerHTML);
+				anteriorCantidad+=cantidad;
+				anteriorCantidad=anteriorCantidad.toFixed(2);
+			}
+			else {
+				cantidad=parseInt(cantidad);
+				var anteriorCantidad=parseInt(cellCantidad.innerHTML);
+				anteriorCantidad+=cantidad;
+			}
+			cellCantidad.innerHTML=anteriorCantidad;
+			var precio=row.cells[2].innerHTML;
+			var cellSubtotal=row.cells[3];
+			var subTotal=anteriorCantidad*parseFloat(precio);
+			subTotal=subTotal.toFixed(2);
+			cellSubtotal.innerHTML=subTotal;
+			return;
+		}
+	}
+	
+	var row=tablaArticulos.insertRow(-1);
+	var cellCantidad=row.insertCell(0);
+	var cellArticulo=row.insertCell(1);
+	var cellPrecio=row.insertCell(2);
+	var cellSubTotal=row.insertCell(3);
+	var cellEliminar=row.insertCell(4);
+	var nombreArticulo=articulo[0].childNodes[7].firstChild.nodeValue;
+	if (descuento!=0||descuento!=undefined) var precio=(articulo[0].childNodes[1].firstChild.nodeValue)-
+	(articulo[0].childNodes[1].firstChild.nodeValue)*(descuento/100);
+	else var precio=articulo[0].childNodes[1].firstChild.nodeValue;
+	precio=precio.toFixed(2);
+	row.setAttribute('mysqlid',MysqlId);
+	row.setAttribute('tipo',tipo);
+	row.setAttribute('unidad',tipoUnidad);
+	row.setAttribute('class','rowsOver');
+	var index=row.rowIndex;
+	if (esDecimal(cantidad)){
+		cellCantidad.innerHTML=parseFloat(cantidad);
+	}
+	else cellCantidad.innerHTML=parseInt(cantidad);
+	var subTotal=cantidad*parseFloat(precio);
+	subTotal=subTotal.toFixed(2);
+	cellSubTotal.innerHTML=subTotal;
+	cellArticulo.innerHTML=nombreArticulo;
+	cellPrecio.innerHTML=precio;
+	cellEliminar.innerHTML='-';
+	cellEliminar.setAttribute('onclick','eliminarArticuloTPV(this)');
+	cellEliminar.setAttribute('class','websimbol');
+}
+function  parseXmlAñadirArticuloComanda(XMLdocument,unidades){
+	var tablaArticulosDivComanda=document.getElementById("tablaArticulosDivComanda"+comandaSeleccionada);
+	if (tablaArticulosDivComanda==null||tablaArticulosDivComanda==undefined) {
+		mostrarDialogoAdvertencia('Debe seleccionar una comanda para añadir articulos');
+		return
+	}
+	if (unidades==undefined){
+		var textoDisplay=document.getElementById('labelTextoDivTPVprincipal').innerHTML;
+		textoDisplay=textoDisplay.trim();
+		if (textoDisplay=='') textoDisplay=1;
+		if (isNaN(textoDisplay)){
+			var resultado=null;
+			var resultado=textoDisplay.match("[*]");
+			if (resultado!=null){
+				switch (resultado.length){
+					case 0:
+						return;
+					case 1:
+						break;
+					default:
+						return;
+				}
+			}
+			var indexAst=textoDisplay.indexOf("*");
+			if (indexAst==0) return;
+			resultado=textoDisplay.split("*");
+			cantidad=resultado[0];
+			resultado[1]=String.trim(resultado[1]);
+			if (resultado[resultado.length-2]=' ') {
+				if (isNaN(resultado[0])) return;
+			}
+			else {
+				if (esDecimal(numero[1])) return;
+				codigoBarras=resultado[1];
+			}
+		}
+		else {
+			cantidad=textoDisplay;
+		}
+	}
+	else cantidad=unidades;
+	
+	var articulo=XMLdocument.getElementsByTagName('articulo');
+	var nombreArticulo=articulo[0].childNodes[7].firstChild.nodeValue;
+	var seccion=articulo[0].childNodes[4].firstChild.nodeValue;
+	var query="SELECT seccion FROM secciones WHERE id=" + seccion;
+	var seccion=String.trim(enviarQuery(query,false));
+	var idArticulo=articulo[0].getAttribute('id');
+	if (seccion=='Suplementos'){
+		var articulosSeleccionados=document.getElementsByClassName('rowsArticulosDivComandaSeleccionado');
+		if (articulosSeleccionados.length==0) {
+			mostrarDialogoAdvertencia('Para introducir un suplemento debe seleccionar un artículo previamente');
+			return;
+		}
+		var articuloSeleccionado=articulosSeleccionados[0];
+		var idDetalleComanda=articuloSeleccionado.getAttribute('mysqlIdDetalle');
+		if (esDecimal(cantidad)){
+			var row=tablaArticulosDivComanda.insertRow(articuloSeleccionado.rowIndex+1);
+			row.setAttribute('class','rowsArticulosDivComandaSuplementos');
+			row.setAttribute('onclick','resetearEstiloTablaComanda('+comandaSeleccionada+');'+
+			'cambiarEstilo(this,"rowsArticulosDivComandaSuplementosSeleccionado","class")');
+			row.setAttribute('mysqlId',idArticulo);
+			var cellUnidades=row.insertCell(0);
+			var cellArticulos=row.insertCell(1);
+			var cellEliminarArticulo=row.insertCell(2);
+			var cellAñadirNota=row.insertCell(3);
+			cellUnidades.innerHTML=parseFloat(cantidad);
+			cellArticulos.innerHTML=nombreArticulo;
+			cellEliminarArticulo.innerHTML="-";
+			cellEliminarArticulo.setAttribute('class','labelEliminarTPVComandas');
+			query="INSERT INTO comandasDetalle (unidades,idArticulo,idComanda,idSuplemento) VALUES ('"+
+			cellUnidades.innerHTML+"',"+idArticulo+","+comandaSeleccionada+","+idDetalleComanda+")";
+			enviarQuery(query,false);
+			query="SELECT id FROM  comandasDetalle ORDER BY id DESC LIMIT 1";
+			var idDetalle=enviarQuery(query,false);
+			row.setAttribute('mysqlIdDetalle',idDetalle);
+			funcion='mostrarDialogoSiNo("Va usted a eliminar este articulo de la comanda, ' +
+			'¿Desea Continuar?","eliminarArticuloSuplementoComandaTPV('+idDetalle+')")';
+			cellEliminarArticulo.setAttribute('onclick',funcion);
+			}
+		else {
+			for (var i=0;i<cantidad;i++){
+				var row=tablaArticulosDivComanda.insertRow(articuloSeleccionado.rowIndex+1);
+				row.setAttribute('class','rowsArticulosDivComandaSuplementos');
+				row.setAttribute('onclick','resetearEstiloTablaComanda('+comandaSeleccionada+');'+
+				'cambiarEstilo(this,"rowsArticulosDivComandaSuplementosSeleccionado","class")');
+				row.setAttribute('mysqlId',idArticulo);
+				var cellUnidades=row.insertCell(0);
+				var cellArticulos=row.insertCell(1);
+				var cellEliminarArticulo=row.insertCell(2);
+				cellUnidades.innerHTML="1";
+				cellArticulos.innerHTML=nombreArticulo;
+				cellEliminarArticulo.innerHTML="-";
+				cellEliminarArticulo.setAttribute('class','labelEliminarTPVComandas');
+				query="INSERT INTO comandasDetalle (unidades,idArticulo,idComanda,idSuplemento) VALUES ('"+
+				cellUnidades.innerHTML+"',"+idArticulo+","+comandaSeleccionada+","+idDetalleComanda+")";
+				enviarQuery(query,false);
+				query="SELECT id FROM  comandasDetalle ORDER BY id DESC LIMIT 1";
+				var idDetalle=enviarQuery(query,false);
+				row.setAttribute('mysqlIdDetalle',idDetalle);
+				funcion='mostrarDialogoSiNo("Va usted a eliminar este articulo de la comanda, ' +
+				'¿Desea Continuar?","eliminarArticuloSuplementoComandaTPV('+idDetalle+')")';
+				cellEliminarArticulo.setAttribute('onclick',funcion);
+			}
+		}
+	}
+	else{
+		if (esDecimal(cantidad)){
+			var row=tablaArticulosDivComanda.insertRow(-1);
+			row.setAttribute('class','rowsArticulosDivComanda');
+			row.setAttribute('onclick','resetearEstiloTablaComanda('+comandaSeleccionada+');'+
+			'cambiarEstilo(this,"rowsArticulosDivComandaSeleccionado","class")');
+			row.setAttribute('mysqlId',idArticulo);
+			var cellUnidades=row.insertCell(0);
+			var cellArticulos=row.insertCell(1);
+			var cellEliminarArticulo=row.insertCell(2);
+			var cellAñadirNota=row.insertCell(3);
+			cellUnidades.innerHTML=parseFloat(cantidad);
+			cellArticulos.innerHTML=nombreArticulo;
+			cellAñadirNota.innerHTML="+";
+			cellAñadirNota.setAttribute('class','labelTraspasarTPVComandas');
+			cellEliminarArticulo.innerHTML="-";
+			cellEliminarArticulo.setAttribute('class','labelEliminarTPVComandas');
+			query="INSERT INTO comandasDetalle (unidades,idArticulo,idComanda) VALUES ('"+cellUnidades.innerHTML+
+			"',"+idArticulo+","+comandaSeleccionada+")";
+			enviarQuery(query,false);
+			query="SELECT id FROM  comandasDetalle ORDER BY id DESC LIMIT 1";
+			var idDetalle=enviarQuery(query,false);
+			row.setAttribute('mysqlIdDetalle',idDetalle);
+			funcion='mostrarDialogoSiNo("Va usted a eliminar este articulo de la comanda, ' +
+			'¿Desea Continuar?","eliminarArticuloComandaTPV('+idDetalle+')")';
+			cellEliminarArticulo.setAttribute('onclick',funcion);
+			cellAñadirNota.setAttribute('onclick','mostrarNotas('+idArticulo+','+idDetalle+')');
+			}
+		else {
+			for (var i=0;i<cantidad;i++){
+				var row=tablaArticulosDivComanda.insertRow(-1);
+				row.setAttribute('class','rowsArticulosDivComanda');
+				row.setAttribute('onclick','resetearEstiloTablaComanda('+comandaSeleccionada+
+				');cambiarEstilo(this,"rowsArticulosDivComandaSeleccionado","class")');
+				row.setAttribute('mysqlId',idArticulo);
+				var cellUnidades=row.insertCell(0);
+				var cellArticulos=row.insertCell(1);
+				var cellEliminarArticulo=row.insertCell(2);
+				var cellAñadirNota=row.insertCell(3);
+				cellUnidades.innerHTML="1";
+				cellArticulos.innerHTML=nombreArticulo;
+				cellAñadirNota.innerHTML="+";
+				cellAñadirNota.setAttribute('class','labelTraspasarTPVComandas');
+				cellAñadirNota.setAttribute('onclick','mostrarNotas('+idArticulo+')');
+				cellEliminarArticulo.innerHTML="-";
+				cellEliminarArticulo.setAttribute('class','labelEliminarTPVComandas');
+				query="INSERT INTO comandasDetalle (unidades,idArticulo,idComanda) VALUES ('"+cellUnidades.innerHTML+
+				"',"+idArticulo+","+comandaSeleccionada+")";
+				enviarQuery(query,false);
+				query="SELECT id FROM  comandasDetalle ORDER BY id DESC LIMIT 1";
+				var idDetalle=enviarQuery(query,false);
+				row.setAttribute('mysqlIdDetalle',idDetalle);
+				cellEliminarArticulo.setAttribute('onclick','eliminarArticuloComandaTPV('+idDetalle+')');
+			}
+		}
+	}
+	limpiarObjeto('labelTextoDivTPVprincipal');
+}
+function parseXmlAñadirStock(XMLdocument){
+	var detalles=XMLdocument.getElementsByTagName('ticketDetalle');
+	for (var i in detalles){
+		if (detalles[i].nodeType!==1) continue;
+		var detalle=detalles[i];
+		var idArticulo=detalle.childNodes[7].firstChild.nodeValue;
+		var unidades=detalle.childNodes[0].firstChild.nodeValue;
+		query="UPDATE articulos,unidades SET stock=(stock-"+unidades+") WHERE articulos.id="+idArticulo;
+		enviarQuery(query);
+	}
+}
+function parseXmlCambioIdiomas(XMLdocument,idIdiomaSeleccionado){
+	var idiomas=XMLdocument.getElementsByTagName('idioma');
+	for (var i in idiomas) {
+		if (idiomas[i].nodeType!==1) continue;
+		idioma=idiomas[i];
+		var idIdioma=idioma.getAttribute('id');
+		var rowArticulo=document.getElementById('rowArticulo'+idIdioma);
+		var rowDescripcion=document.getElementById('rowDescripcion'+idIdioma);
+		if (idIdioma==idIdiomaSeleccionado){
+			rowArticulo.style.display='table-row';
+			rowDescripcion.style.display='table-row';
+		}
+		else{
+			rowArticulo.style.display='none';
+			rowDescripcion.style.display='none';
+		}
+	}
+}
+
+function parseXmlCierres(XMLdocument){
+	var cierres=XMLdocument.getElementsByTagName('cierre');
+	var tablaListadoCierres=document.getElementById('tablaDivListadoCierresBody');
+	limpiarTabla(tablaListadoCierres);
+	for (var i in cierres){
+		if (cierres[i].nodeType!==1) continue;
+		var cierre=cierres[i];
+		var MysqlId=cierre.getAttribute('id');
+		var row=tablaListadoCierres.insertRow(-1);
+		var cellIdCierre=row.insertCell(0);
+		var cellFechaHora=row.insertCell(1);
+		var texto='mostrarCierreDetalle("'+MysqlId+'");resetearEstiloTabla("tablaDivListadoCierresBody"'+
+		',"rowsListadoArticulo","class");cambiarEstilo(this,"rowsListadoArticuloSeleccionado","class")';
+		row.setAttribute('onclick',texto);
+		row.setAttribute('class','rowsListadoArticulo');
+		cellIdCierre.innerHTML=MysqlId;
+		cellFechaHora.innerHTML=cierre.childNodes[0].firstChild.nodeValue;
+	}
+}
+function parseXmlClientes(XMLdocument){
+	var clientes=XMLdocument.getElementsByTagName('cliente');
+	var tablaClientes=document.getElementById('tablaListadoClientesBody');
+	limpiarTabla(tablaClientes);
+	for (var i in clientes){
+		if (clientes[i].nodeType!==1) continue;
+		var cliente=clientes[i];
+		var row=tablaClientes.insertRow(-1);
+		var cellCliente=row.insertCell(0);
+		var cellDireccion=row.insertCell(1);
+		var idCliente=cliente.getAttribute('id');
+		row.setAttribute('mysqlId',idCliente);
+		row.setAttribute('class','rowsListadoArticulo');
+		var texto='rellenaDatosClientes('+idCliente+');resetearEstiloTabla("tablaListadoClientesBody","rowsListadoArticulo","class");cambiarEstilo(this,"rowsListadoArticuloSeleccionado","class")';
+		row.setAttribute('onclick',texto);
+		cellCliente.innerHTML=cliente.childNodes[0].firstChild.nodeValue;
+		if (cliente.childNodes[1].firstChild!=null) cellDireccion.innerHTML=cliente.childNodes[1].firstChild.nodeValue;
+	}
+}
+function parseXmlDatosIdiomas(XMLdocument){
+	var idiomas=XMLdocument.getElementsByTagName('idioma');
+	var tablaListadoIdiomas=document.getElementById('tablaIdiomasBody');
+	limpiarTabla(tablaListadoIdiomas);
+	for (var i in idiomas) {
+		if (idiomas[i].nodeType!==1) continue;
+		idioma=idiomas[i];
+		var idIdioma=idioma.getAttribute('id');
+		var nombreIdioma=idioma.childNodes[0].firstChild.nodeValue;
+		var idArchivo=idioma.childNodes[1].firstChild.nodeValue;
+		var nombreArchivo=idioma.childNodes[2].firstChild.nodeValue;
+		var row=tablaListadoIdiomas.insertRow(-1);
+		row.setAttribute('mysqlId',idIdioma);
+		var cellIdioma=row.insertCell(0);
+		var cellBandera=row.insertCell(1);
+		var cellEditar=row.insertCell(2);
+		var cellEliminar=row.insertCell(3);
+		cellIdioma.innerHTML=nombreIdioma;
+		cellBandera.innerHTML='<img class=listadoBanderas height="30px" width="50px" src="./recursos/'+nombreArchivo+'">';
+		cellEditar.innerHTML="<label class=editarSeccion>z</label>";
+		cellEliminar.innerHTML="<label class=eliminarUnidad onclick='eliminarEliminar()'>-</label>";
+		var texto="mostrarDialogoSiNo('Va usted a eliminar un idioma. ¿Desea Continuar?','eliminarIdioma(\"" + idIdioma + "\")')";
+		cellEliminar.setAttribute('onclick',texto);
+		texto="mostrarDialogoSiNo('Va usted a editar una idioma. ¿Desea Continuar?','editarIdioma(\"" + idIdioma + "\")')";
+		cellEditar.setAttribute('onclick',texto);
+	}
+	limpiarIdiomas();
+}
+function parseXmlDatosTeclasComandas(XMLdocument){
+	var clientes=XMLdocument.getElementsByTagName('cliente');
+	var tablaTeclasComandas=document.getElementById('tablaTeclasComandasBody');
+	for (var i=0;i<tablaTeclasComandas.rows.length;i++){
+		var row=tablaTeclasComandas.rows[i];
+		for (var j=0;j<row.cells.length;j++){
+			var cell=row.cells[j];
+			cell.innerHTML='';
+			cell.removeAttribute('mysqlId');
+		}
+	}
+	for (var i in clientes) {
+		if (clientes[i].nodeType!==1) continue;
+		cliente=clientes[i];
+		if (cliente.childNodes[2].firstChild==null) continue;
+		var position=cliente.childNodes[2].firstChild.nodeValue ;
+		if (position==0)continue;
+		var nombre=cliente.childNodes[0].firstChild.nodeValue;
+		var idCliente=cliente.getAttribute('id');
+		var numRow= position.charAt(1);
+		numRow-=1;
+		var numCell= position.charAt(2);
+		numCell-=1;
+		var cellTeclaComanda=tablaTeclasComandas.rows[numRow].cells[numCell];
+		cellTeclaComanda.innerHTML=nombre;
+		cellTeclaComanda.setAttribute('MysqlId',idCliente);
+		
+	}
+}
+function parseXmlDatosTeclasComandasTPV(XMLdocument){
+	var clientes=XMLdocument.getElementsByTagName('cliente');
+	var tablaTeclasComandas=document.getElementById('tablaTeclasComandasTPVBody');
+	for (var i=0;i<tablaTeclasComandas.rows.length;i++){
+		var row=tablaTeclasComandas.rows[i];
+		for (var j=0;j<row.cells.length;j++){
+			var cell=row.cells[j];
+			cell.innerHTML='';
+			cell.removeAttribute('mysqlId');
+		}
+	}
+	for (var i in clientes) {
+		if (clientes[i].nodeType!==1) continue;
+		cliente=clientes[i];
+		if (cliente.childNodes[2].firstChild==null) continue;
+		var position=cliente.childNodes[2].firstChild.nodeValue ;
+		if (position==0)continue;
+		var nombre=cliente.childNodes[0].firstChild.nodeValue;
+		var idCliente=cliente.getAttribute('id');
+		var numRow= position.charAt(1);
+		numRow-=1;
+		var numCell= position.charAt(2);
+		numCell-=1;
+		var cellTeclaComanda=tablaTeclasComandas.rows[numRow].cells[numCell];
+		cellTeclaComanda.setAttribute('style','cursor:pointer');
+		cellTeclaComanda.innerHTML=nombre;
+		cellTeclaComanda.setAttribute('MysqlId',idCliente);
+	}
+}
+function parseXmlDatosAumentarTeclasRapidas(XMLdocument,numeroPanel){
+	var teclasRapidas=XMLdocument.getElementsByTagName('tecla');
+	var tablaTeclasRapidas=document.getElementById('tablaAumentarTeclasRapidasBody');
+	for (var i in teclasRapidas) {
+		if (teclasRapidas[i].nodeType===1){
+			var teclaRapida=teclasRapidas[i];
+		}
+		else continue;
+		var position=teclaRapida.getAttribute('id') ;
+		
+		var MysqlId=teclaRapida.childNodes[1].firstChild.nodeValue;
+		try {
+			var articulo=teclaRapida.childNodes[0].firstChild.nodeValue;
+		}
+		catch (err){
+                	continue;		
+		}
+		var numero = position.charAt(0);
+		if (numero==numeroPanel) {
+			var numRow= position.charAt(1);
+			numRow-=1;
+			var numCell= position.charAt(2);
+			numCell-=1;
+			cellTeclaRapida=tablaTeclasRapidas.rows[numRow].cells[numCell];
+			cellTeclaRapida.innerHTML=articulo;
+			cellTeclaRapida.setAttribute('MysqlId',MysqlId);
+		}
+	}
+}
+function parseXmlDatosTeclasRapidas(XMLdocument,numeroPanel){
+	var teclasRapidas=XMLdocument.getElementsByTagName('tecla');
+	var tablaTeclasRapidas=document.getElementById('tablaTeclasRapidasBody');
+	for (var i in teclasRapidas) {
+		if (teclasRapidas[i].nodeType===1){
+			teclaRapida=teclasRapidas[i];
+		}
+		else continue;
+		var position=teclaRapida.getAttribute('id') ;
+                try {
+			var articulo=teclaRapida.childNodes[0].firstChild.nodeValue;
+		}
+		catch (err){
+                	continue;		
+		}
+		var MysqlId=teclaRapida.childNodes[1].firstChild.nodeValue;
+		var numero = position.charAt(0);
+		if (numero==numeroPanel) {
+			var numRow= position.charAt(1);
+			numRow-=1;
+			if (numRow>2)	continue;
+			var numCell= position.charAt(2);
+			numCell-=1;
+			if (numCell>5)	continue;
+			cellTeclaRapida=tablaTeclasRapidas.rows[numRow].cells[numCell];
+			cellTeclaRapida.innerHTML=articulo;
+			cellTeclaRapida.setAttribute('MysqlId',MysqlId);
+		}
+	}
+}
+function parseXmlDatosTeclasRapidasTPV(XMLdocument,numeroPanel){
+	var teclasRapidas=XMLdocument.getElementsByTagName('tecla');
+	var tablaTeclasRapidas=document.getElementById('TPVtablaTeclasRapidasBody');
+	for (var i=0;i<tablaTeclasRapidas.rows.length;i++){
+		var row=tablaTeclasRapidas.rows[i];
+		for (var j=0;j<row.cells.length;j++){
+			var cell=row.cells[j];
+			cell.removeAttribute('mysqlId');
+		}
+	}
+	for (var i in teclasRapidas) {
+		if (teclasRapidas[i].nodeType===1){
+			teclaRapida=teclasRapidas[i];
+		}
+		else continue;
+		var position=teclaRapida.getAttribute('id') ;
+		try {
+			var articulo=teclaRapida.childNodes[0].firstChild.nodeValue;
+		}
+		catch (err){
+                	continue;		
+		}
+		
+		var MysqlId=teclaRapida.childNodes[1].firstChild.nodeValue;
+		var numero = position.charAt(0);
+		if (numero==numeroPanel) {
+			var numRow= position.charAt(1);
+			numRow-=1;
+			if (numRow>2)	continue;
+			var numCell= position.charAt(2);
+			numCell-=1;
+			if (numCell>5)	continue;
+			var cellTeclaRapida=tablaTeclasRapidas.rows[numRow].cells[numCell];
+			cellTeclaRapida.innerHTML=articulo;
+			cellTeclaRapida.setAttribute('MysqlId',MysqlId);
+		}
+	}
+}
+function parseXmlDatosTicketsCierres(XMLdocument){
+	var tickets=XMLdocument.getElementsByTagName('ticket');
+	var tablaTickets=document.getElementById('tablaDivListadoTicketsCierresBody');
+	while (tablaTickets.rows.length!=0){
+		tablaTickets.deleteRow(-1);
+	}
+	var rowPrimera;
+	var primera =true;
+	for (var i in tickets) {
+		if (tickets[i].nodeType!==1)continue;
+		var ticket=tickets[i];
+		var MysqlId=ticket.getAttribute('id');
+		var row=tablaTickets.insertRow(-1);
+		var cellNumeroTicket=row.insertCell(0);
+		var cellFecha=row.insertCell(1);
+		var cellPago=row.insertCell(2);
+		var cellDescuento=row.insertCell(3);
+		var cellTotal=row.insertCell(4);
+		cellNumeroTicket.innerHTML=MysqlId;
+		cellFecha.innerHTML=ticket.childNodes[0].firstChild.nodeValue;
+		cellPago.innerHTML=ticket.childNodes[1].firstChild.nodeValue;
+		cellDescuento.innerHTML=ticket.childNodes[2].firstChild.nodeValue;
+		var total=parseFloat(ticket.childNodes[3].firstChild.nodeValue);
+		cellTotal.innerHTML=total.toFixed(2);
+		row.setAttribute('class','rowsListadoArticulo');
+		row.setAttribute('MysqlId',MysqlId);
+		var texto="mostrarTicket("+MysqlId+",'cierres');resetearEstiloTabla('tablaDivListadoTicketsCierresBody','rowsListadoArticulo','class');cambiarEstilo(this,'rowsListadoArticuloSeleccionado','class')";
+		row.setAttribute('onclick',texto);
+		if (primera) {
+			rowPrimera=row;
+			primera=false;		
+		}
+	}
+
+	if (primera==false) {
+		mostrarTicket(rowPrimera.getAttribute('MysqlId'),'cierres');
+		resetearEstiloTabla('tablaDivListadoTicketsCierresBody','rowsListadoArticulo','class');
+		cambiarEstilo(rowPrimera,'rowsListadoArticuloSeleccionado','class')
+	}
+	else limpiarObjeto('divListadoTicketsMostrarTicketCierres');
+}
+function parseXmlDatosTicketsTPV(XMLdocument){
+	var tickets=XMLdocument.getElementsByTagName('ticket');
+	var tablaTickets=document.getElementById('tablaDivListadoTicketsBody');
+	while (tablaTickets.rows.length!=0){
+		tablaTickets.deleteRow(-1);
+	}
+	var rowPrimera;
+	var primera =true;
+	for (var i in tickets) {
+		if (tickets[i].nodeType!==1)continue;
+		var ticket=tickets[i];
+		var MysqlId=ticket.getAttribute('id');
+		var row=tablaTickets.insertRow(-1);
+		var cellNumeroTicket=row.insertCell(0);
+		var cellFecha=row.insertCell(1);
+		var cellPago=row.insertCell(2);
+		var cellDescuento=row.insertCell(3);
+		var cellTotal=row.insertCell(4);
+		cellNumeroTicket.innerHTML=MysqlId;
+		cellFecha.innerHTML=ticket.childNodes[0].firstChild.nodeValue;
+		cellPago.innerHTML=ticket.childNodes[1].firstChild.nodeValue;
+		cellDescuento.innerHTML=ticket.childNodes[2].firstChild.nodeValue;
+		var total=parseFloat(ticket.childNodes[3].firstChild.nodeValue);
+		cellTotal.innerHTML=total.toFixed(2);
+		row.setAttribute('class','rowsListadoArticulo');
+		row.setAttribute('MysqlId',MysqlId);
+		var texto="mostrarTicket("+MysqlId+");resetearEstiloTabla('tablaDivListadoTicketsBody','rowsListadoArticulo','class');cambiarEstilo(this,'rowsListadoArticuloSeleccionado','class')";
+		row.setAttribute('onclick',texto);
+		if (primera) {
+			rowPrimera=row;
+			primera=false;		
+		}
+	}
+	if (primera==false) {
+		mostrarTicket(rowPrimera.getAttribute('MysqlId'));
+		resetearEstiloTabla('tablaDivListadoTicketsBody','rowsListadoArticulo','class');
+		cambiarEstilo(rowPrimera,'rowsListadoArticuloSeleccionado','class')
+	}
+	else limpiarObjeto('divListadoTicketsMostrarTicket');
+	
+}
+function parseXmlDevolverStock(XMLdocument){
+	var detalles=XMLdocument.getElementsByTagName('ticketDetalle');
+	for (var i in detalles){
+		if (detalles[i].nodeType!==1) continue;
+		var detalle=detalles[i];
+		var idArticulo=detalle.childNodes[7].firstChild.nodeValue;
+		var unidades=detalle.childNodes[0].firstChild.nodeValue;
+		query="UPDATE articulos,unidades SET stock=(stock%2B"+unidades+") WHERE articulos.id="+idArticulo;
+		enviarQuery(query);
+	}
+		
+}
+function parseXmlDevolverStockCompra(XMLdocument){
+	var detalles=XMLdocument.getElementsByTagName('detalle');
+	for (var i in detalles) {
+		if (detalles[i].nodeType!==1) continue;
+		var detalle=detalles[i];
+		var idArticulo=detalle.childNodes[0].getAttribute('id');
+		var unidades=parseInt(detalle.childNodes[1].firstChild.nodeValue);
+		query="UPDATE articulos,unidades SET stock=(stock-"+unidades+") WHERE articulos.id="+idArticulo;
+		enviarQuery(query);
+	}	
+}
+function parseXmlGuardarCamposIdiomas(XMLdocument,idArticulo){
+	var query="DELETE FROM idiomasDetalle WHERE idArticulo="+ idArticulo;
+	enviarQuery(query,false);
+	var idiomas=XMLdocument.getElementsByTagName('idioma');
+	for (var i in idiomas) {
+		if (idiomas[i].nodeType!==1) continue;
+		idioma=idiomas[i];
+		var idIdioma=idioma.getAttribute('id');
+		var nombreIdioma=idioma.childNodes[0].firstChild.nodeValue;
+		if (nombreIdioma=='Castellano') continue;
+		var articulo=document.getElementById('inputArticulo'+idIdioma).value;
+		var descripcion=document.getElementById('textareaDescripcionArticulo'+idIdioma).value;
+		query="INSERT INTO idiomasDetalle (articulo,descripcion,idArticulo,idIdioma) VALUES ('"+articulo+"','"+
+		descripcion+"',"+idArticulo+","+idIdioma+")";
+		enviarQuery(query);
+	}
+	limpiarPanelArticulos();
+}
+function parseXmlEditarTicket(XMLdocument){
+	var detalles=XMLdocument.getElementsByTagName('ticketDetalle');
+	var numeroTicket=detalles[0].getAttribute('id');
+	prepararTPV(numeroTicket);
+	tablaArticulos=document.getElementById('tablaTPVArticulosBody');
+	for (var i in detalles){
+		if (detalles[i].nodeType!==1) continue;
+		var detalle=detalles[i];
+		var mysqlId=detalle.getAttribute('id');
+		var row=tablaArticulos.insertRow(-1);
+		row.setAttribute('mysqlId',detalle.childNodes[7].firstChild.nodeValue);
+		row.setAttribute('unidad',detalle.childNodes[8].firstChild.nodeValue);
+		row.setAttribute('tipo',detalle.childNodes[4].firstChild.nodeValue);
+		var cellUnidad=row.insertCell(0);
+		var cellArticulo=row.insertCell(1);
+		var cellPrecio=row.insertCell(2);
+		var cellSubTotal=row.insertCell(3);
+		var cellEliminar=row.insertCell(4);
+		cellUnidad.innerHTML=detalle.childNodes[0].firstChild.nodeValue;
+		cellArticulo.innerHTML=detalle.childNodes[1].firstChild.nodeValue;
+		cellPrecio.innerHTML=detalle.childNodes[2].firstChild.nodeValue;
+		cellSubTotal.innerHTML=detalle.childNodes[3].firstChild.nodeValue;
+		cellEliminar.innerHTML='-';
+		cellEliminar.setAttribute('onclick','eliminarArticuloTPV(this)');
+		cellEliminar.setAttribute('class','websimbol');
+	}
+	actualizarTotalTPV();
+}
+function parseXmlImpuestos (XMLdocument){
+	var impuestos=XMLdocument.getElementsByTagName('impuesto');
+	var tablaImpuestos=document.getElementById('tablaImpuestosBody');
+	var objetoSelector=document.getElementById('selectorImpuestosArticulos');
+	limpiarSelector(objetoSelector);
+	while (tablaImpuestos.rows.length!=0){
+		tablaImpuestos.deleteRow(-1);
+	}
+	for (var i in impuestos) {
+		var row=tablaImpuestos.insertRow(-1);
+		if (impuestos[i].nodeType===1){
+			var id=impuestos[i].getAttribute('id');
+			
+		}
+		else continue;
+		row.id='rowTablaImpuestos'+id;
+		var cellImpuesto=row.insertCell(0);
+		var cellTipo=row.insertCell(1);
+		var cellEditar=row.insertCell(2);
+		var cellEliminar=row.insertCell(3);
+		cellEliminar.setAttribute('class','celdaBotonEliminar');
+		cellEditar.setAttribute('class','celdaBotonEditar');
+		row.setAttribute('class','rows');
+		var impuesto=impuestos[i].childNodes[0].firstChild;
+		var tipo=impuestos[i].childNodes[1].firstChild;
+		cellImpuesto.innerHTML=impuesto.nodeValue;
+		cellEliminar.innerHTML="<label class=eliminarImpuesto>-</label>";
+		cellEditar.innerHTML="<label class=editarImpuesto>z</label>";
+		cellTipo.innerHTML=tipo.nodeValue;
+		var texto="mostrarDialogoSiNo('Va usted a eliminar un impuesto. ¿Desea Continuar?','eliminarImpuesto(\"" + impuesto.nodeValue + "\")')";
+		cellEliminar.setAttribute('onclick',texto);
+		texto="mostrarDialogoSiNo('Va usted a editar un impuesto. ¿Desea Continuar?','editarImpuesto(\"" + id + "\",\"" + impuesto.nodeValue + "\",\"" + tipo.nodeValue + "\")')";
+		cellEditar.setAttribute('onclick',texto);
+		añadirOpcion(objetoSelector,impuesto.nodeValue,id);
+	}
+}
+function parseXmlListadoArticulos(XMLdocument){
+	var articulos=XMLdocument.getElementsByTagName('articulo');
+	var tablaArticulos=document.getElementById('tablaListadoArticulosBody');
+	
+	while (tablaArticulos.rows.length!=0){
+		tablaArticulos.deleteRow(-1);
+	}
+	for (var i in articulos) {
+		var row=tablaArticulos.insertRow(-1);
+		if (articulos[i].nodeType===1){
+			var id=articulos[i].getAttribute('id');
+		}
+		else continue;
+		row.setAttribute('class','rowsListadoArticulo');
+		row.setAttribute('MysqlId',id);
+		row.setAttribute('onMouseDown','rellenaArticulo(this);resetearEstiloTabla("tablaListadoArticulosBody","rowsListadoArticulo","class");cambiarEstilo(this,"rowsListadoArticuloSeleccionado","class")');
+		var cellArticulo=row.insertCell(0);
+		var cellSeccion=row.insertCell(1);
+		var cellPrecio=row.insertCell(2);
+		var nombreArticulo=articulos[i].childNodes[3].firstChild.nodeValue;
+		cellArticulo.innerHTML=nombreArticulo;
+		var seccion=articulos[i].childNodes[1].firstChild;
+		cellSeccion.innerHTML=seccion.nodeValue;
+		var precio=articulos[i].childNodes[2].firstChild;
+		cellPrecio.innerHTML=precio.nodeValue;
+	}
+}
+function parseXmlListadoArticulosCompras(XMLdocument){
+	var articulos=XMLdocument.getElementsByTagName('articulo');
+	var tablaArticulosTeclasRapidas=document.getElementById('tablaArticulosTeclasRapidas');
+	limpiarTabla(tablaArticulosTeclasRapidas);
+	for (var i in articulos) {
+		if (articulos[i].nodeType!==1) continue;
+		var row=tablaArticulosTeclasRapidas.insertRow(-1);
+		var articulo=articulos[i];
+		var idArticulo=articulo.getAttribute('id');
+		row.setAttribute('MysqlId',idArticulo);
+		row.setAttribute('class','rowsListadoArticulo');
+		var funcion='añadirArticuloCompras(this);ocultarElemento("divTablaArticulosTeclasRapidas")';
+		row.setAttribute('onclick',funcion);
+		var cellArticulo=row.insertCell(0);
+		var cellPrecio=row.insertCell(1);
+		var nombreArticulo=articulo.childNodes[3].firstChild.nodeValue;
+		cellArticulo.innerHTML=nombreArticulo;
+		var precio=articulo.childNodes[2].firstChild;
+		cellPrecio.innerHTML=precio.nodeValue;
+	}
+}
+function parseXmlListadoComandas(XMLdocument){
+	var comandas=XMLdocument.getElementsByTagName('comanda');
+	var tablaListadoComandas=document.getElementById('tablaComandasBodyTPV');
+	limpiarTabla(tablaListadoComandas);
+	for (var i in comandas) {
+		if (comandas[i].nodeType!==1) continue;
+		var comanda=comandas[i];
+		var row=tablaListadoComandas.insertRow(-1);
+		var idCliente=comanda.childNodes[0].firstChild.nodeValue;
+		var objeto2=document.getElementById('divTablaClientes');
+		row.setAttribute('class','rows');
+		var funcion='seleccionarClientesTPV(' + idCliente + ');ocultarElemento("divTablaClientes")';
+		row.setAttribute('onclick',funcion);
+		var cellCliente=row.insertCell(0);
+		var cellDireccion=row.insertCell(1);
+		var cellFecha=row.insertCell(2);
+		cellCliente.innerHTML=comanda.childNodes[1].firstChild.nodeValue;
+		if (comanda.childNodes[2].firstChild!=null) cellDireccion.innerHTML=comanda.childNodes[2].firstChild.nodeValue;
+		cellFecha.innerHTML=comanda.childNodes[3].firstChild.nodeValue;
+	}
+}
+function parseXmlListadoCompras(XMLdocument){
+	var compras=XMLdocument.getElementsByTagName('compra');
+	var tablaListadoCompras=document.getElementById('tablaListadoComprasBody');
+	limpiarTabla(tablaListadoCompras);
+	for (var i in compras) {
+		if (compras[i].nodeType!==1) continue;
+		var row=tablaListadoCompras.insertRow(-1);
+		var compra=compras[i];
+		var idCompra=compra.getAttribute('id');
+		row.setAttribute('MysqlId',idCompra);
+		row.setAttribute('class','rowsListadoArticulo');
+		var funcion='rellenaDetalleCompras("'+idCompra+'");resetearEstiloTabla("tablaListadoComprasBody","rowsListadoArticulo","class");cambiarEstilo(this,"rowsListadoArticuloSeleccionado","class")';
+		row.setAttribute('onclick',funcion);
+		var cellFecha=row.insertCell(0);
+		var cellProveedor=row.insertCell(1);
+		var cellFactura=row.insertCell(2);
+		var cellFechaFactura=row.insertCell(3);
+		var cellTotal=row.insertCell(4);
+		
+		cellFecha.innerHTML=compra.childNodes[0].firstChild.nodeValue;
+		cellProveedor.innerHTML=compra.childNodes[1].firstChild.nodeValue;
+		cellFactura.innerHTML=compra.childNodes[2].firstChild.nodeValue;
+		cellFechaFactura.innerHTML=compra.childNodes[3].firstChild.nodeValue;
+		cellTotal.innerHTML=compra.childNodes[4].firstChild.nodeValue;
+	}
+}
+function parseXmlListados(XMLdocument){
+	var selector=document.getElementById('selectDivListados');
+	limpiarSelector(selector);
+	var listados=XMLdocument.getElementsByTagName('listado');
+	for (var i in listados) {
+		if (listados[i].nodeType!==1)continue;
+		var listado=listados[i];
+		if (listado.childNodes[0].firstChild.nodeValue=='BalanceCierres') continue;
+		añadirOpcion(selector,listado.childNodes[0].firstChild.nodeValue,listado.childNodes[0].firstChild.nodeValue);
+	}
+	añadirOpcion(selector,'BalanceCierres','BalanceCierres');
+}
+function parseXmlListadoImpresoras(XMLdocument){
+	var impresorasList=jsPrintSetup.getPrintersList();
+	var impresorasArray=impresorasList.split(",");
+	for (var i=0;i<impresorasArray.length;i++) {
+		listaImpresoras[i]=impresorasArray[i];
+	}
+}
+function parseXmlMostrarCierreDetalle(XMLdocument){
+	var divCierres=document.getElementById('divListadoCierresMostrarDetalle');
+	var cierres=XMLdocument.getElementsByTagName('cierreDetalle');
+	var cierre=cierres[0];
+	var idCierre=cierre.getAttribute('id');
+	var fecha=cierre.childNodes[0].firstChild.nodeValue;
+	if (cierre.childNodes[1].hasChildNodes()) var ticketsEfectivo=parseFloat(cierre.childNodes[1].firstChild.nodeValue);
+	else ticketsEfectivo=0;
+	if (cierre.childNodes[2].hasChildNodes()) var ticketsTarjeta=parseFloat(cierre.childNodes[2].firstChild.nodeValue);
+	else ticketsTarjeta=0;
+	if (cierre.childNodes[3].hasChildNodes()) var ticketsTotal=parseFloat(cierre.childNodes[3].firstChild.nodeValue);
+	else ticketsTotal=0;
+	if (cierre.childNodes[4].hasChildNodes()) var pagos=parseFloat(cierre.childNodes[4].firstChild.nodeValue);
+	else pagos=0;
+	if (cierre.childNodes[5].hasChildNodes()) var cambio=parseFloat(cierre.childNodes[5].firstChild.nodeValue);
+	else cambio=0;
+	if (cierre.childNodes[6].hasChildNodes()) var descuentos=parseFloat(cierre.childNodes[6].firstChild.nodeValue);
+	else descuentos=0;
+	if (cierre.childNodes[7].hasChildNodes()) var devolucionEfectivo=parseFloat(cierre.childNodes[7].firstChild.nodeValue);
+	else devolucionEfectivo=0;
+	if (cierre.childNodes[8].hasChildNodes()) var devolucionTarjetas=parseFloat(cierre.childNodes[8].firstChild.nodeValue);
+	else devolucionTarjetas=0;
+	if (cierre.childNodes[9].hasChildNodes()) var balance=parseFloat(cierre.childNodes[9].firstChild.nodeValue);
+	else balance=0;
+	if (balance!=ticketsEfectivo) var DevolucionOtrosCierres=-(ticketsEfectivo-balance);
+	else var  DevolucionOtrosCierres=0;
+	var totalDevolucion=devolucionEfectivo+devolucionTarjetas+DevolucionOtrosCierres;
+	var totalBalance=ticketsEfectivo+cambio-pagos-DevolucionOtrosCierres;
+	var texto="<label>Cierre de caja nº: "+idCierre+"</label><br><label>Fecha: "+fecha+"</label><hr><label>"+
+	"A) Total Efectivo:  "+ticketsEfectivo.toFixed(2)+"</label><br><label>Total Tarjetas: "+ticketsTarjeta.toFixed(2)+
+	"</label><br><label>Total: "+ticketsTotal.toFixed(2)+"</label><br><hr><label>B) Pago a proveedores: "+pagos.toFixed(2)+
+	"</label><br><label>C) Cambio introducido: "+cambio.toFixed(2)+"</label><br><label>Descuentos: "+descuentos.toFixed(2)+
+	"</label><br><hr><label>D) Devolución Efectivo: "+devolucionEfectivo.toFixed(2)+"</label><br>"+
+	"<label>E) Devolución Tarjetas: "+devolucionTarjetas.toFixed(2)+"</label><br><label>F) Devolución otros cierres: "+
+	DevolucionOtrosCierres.toFixed(2)+"</label><br><label>Devolución Total (D+E+F): "+ totalDevolucion.toFixed(2) +"</label><hr><label>"+
+	"Balance Caja (A+C-B-D-F): "+totalBalance.toFixed(2)+"</label><hr><label>Impuestos: </label><br>";
+	var impuestos=XMLdocument.getElementsByTagName('impuesto');
+	var total=0;
+	for (var i in impuestos){
+		if (impuestos[i].nodeType!==1)continue;
+		var impuesto=impuestos[i];
+		var tipo=impuesto.getAttribute('tipo');
+		var base=impuesto.getAttribute('base');
+		total+=parseFloat(impuesto.firstChild.nodeValue);
+		var cantidad=parseFloat(impuesto.firstChild.nodeValue);
+		texto+="<label>Tipo "+tipo+"% ("+base+") "+cantidad.toFixed(2)+"</label><br>";
+	}
+	texto+="<label>Total: "+total.toFixed(2)+"</label><br><hr>";
+	divCierres.innerHTML=texto;
+	divCierres.style.display='block';
+		
+}
+function parseXmlMostrarTicket(XMLdocument,creandoTicket){
+	var detalles=XMLdocument.getElementsByTagName('ticketDetalle');
+	var numeroTicket=detalles[0].getAttribute('id');
+	var descuento=detalles[0].childNodes[5].firstChild.nodeValue;
+	var fechaHora=detalles[0].childNodes[9].firstChild.nodeValue;
+	if (detalles[0].childNodes[6].hasChildNodes()) var marca=detalles[0].childNodes[6].firstChild.nodeValue;
+	else marca=null;
+	if (descuento==0) cadenaDescuento='';
+	else cadenaDescuento='Dto: ' + descuento + "%";
+	var divTicketsDetalle=document.getElementById('divListadoTicketsMostrarTicket');
+	divTicketsDetalle.style.display='block';
+	divTicketsDetalle.innerHTML='';
+	var query="SELECT direccion FROM clientes WHERE id=(SELECT idCliente FROM comandas WHERE idTicket="+numeroTicket+")";
+	var direccion=enviarQuery(query,false);
+	var query="SELECT cliente FROM clientes WHERE id=(SELECT idCliente FROM comandas WHERE idTicket="+numeroTicket+")";
+	var cliente=enviarQuery(query,false);
+	if (cliente!='') var masTexto="<label>"+cliente+"</label><br><label>"+direccion+"</label><hr>";
+	else var masTexto="";
+	var texto="<label>"+listaSettings[0]+"</label><br><label>"+listaSettings[2]+"</label><br>"+
+	"<label>"+listaSettings[1]+"</label><hr><label>"+fechaHora+"</label><hr>" + masTexto +
+	"<label id=labelNumeroTicketsDetalle mysqlId="+numeroTicket+">Factura simplicada nº: " + numeroTicket + 
+	"</label><hr><table id=tablaTicketsDetalle style='width:98%'></table><label id=labelDescuentoTicketsDetalle>" + cadenaDescuento +
+	"</label><hr>";
+	divTicketsDetalle.innerHTML=texto;
+	var tablaDetalles=document.getElementById('tablaTicketsDetalle');
+	var total=0;
+	for (var i in detalles){
+		if (detalles[i].nodeType!==1)continue;
+		var detalle=detalles[i];
+		var row=tablaDetalles.insertRow(-1);
+		var cellUnidades=row.insertCell(0);
+		var cellArticulo=row.insertCell(1);
+		var cellPrecio=row.insertCell(2);
+		var cellSubtotal=row.insertCell(3);
+		cellUnidades.innerHTML=detalle.childNodes[0].firstChild.nodeValue;
+		cellArticulo.innerHTML=detalle.childNodes[1].firstChild.nodeValue;
+		cellPrecio.innerHTML=detalle.childNodes[2].firstChild.nodeValue;
+		var subTotal=parseFloat(detalle.childNodes[3].firstChild.nodeValue);
+		cellSubtotal.innerHTML=subTotal.toFixed(2);
+		total+=parseFloat(detalle.childNodes[3].firstChild.nodeValue);
+	}
+	if (descuento!=0) total=total-(total*descuento)/100;
+	total=total.toFixed(2);
+	divTicketsDetalle.innerHTML+="<label id=labelTotalTicketsDetalle style='font-size:20px' total="+total+">TOTAL: " + total + "</label>";
+	divTicketsDetalle.innerHTML+="<br>IGIC incluido"
+	if (marca!=null) divTicketsDetalle.innerHTML+="<br><hr><label id=labelTicketDetalleMarca>"+marca+"</label>";
+	else divTicketsDetalle.innerHTML+="<br><hr><label id=labelTicketDetalleMarca>Gracias por su visita</label>";
+	if (creandoTicket) imprimirDocumento('divListadoTicketsMostrarTicket');
+}
+function parseXmlMostrarTicketCierres (XMLdocument){
+	var detalles=XMLdocument.getElementsByTagName('ticketDetalle');
+	var numeroTicket=detalles[0].getAttribute('id');
+	var descuento=detalles[0].childNodes[5].firstChild.nodeValue;
+	var fechaHora=detalles[0].childNodes[9].firstChild.nodeValue;
+	if (detalles[0].childNodes[6].hasChildNodes()) var marca=detalles[0].childNodes[6].firstChild.nodeValue;
+	else marca=null;
+	if (descuento==0) cadenaDescuento='';
+	else cadenaDescuento='Dto: ' + descuento + "%";
+	var divTicketsDetalle=document.getElementById('divListadoTicketsMostrarTicketCierres');
+	divTicketsDetalle.style.display='block';
+	divTicketsDetalle.innerHTML='';
+	var query="SELECT direccion FROM clientes WHERE id=(SELECT idCliente FROM comandas WHERE idTicket="+numeroTicket+")";
+	var direccion=enviarQuery(query,false);
+	var query="SELECT cliente FROM clientes WHERE id=(SELECT idCliente FROM comandas WHERE idTicket="+numeroTicket+")";
+	var cliente=enviarQuery(query,false);
+	if (cliente!='') var masTexto="<label>"+cliente+"</label><br><label>"+direccion+"</label><hr>";
+	else var masTexto="";
+	var texto="<label>"+listaSettings[0]+"</label><br><label>"+listaSettings[2]+"</label><br>"+
+	"<label>"+listaSettings[1]+"</label><hr><label>"+fechaHora+"</label><hr>" + masTexto +
+	"<label id=labelNumeroTicketsDetalle mysqlId="+numeroTicket+">Factura simplicada nº: " + numeroTicket + 
+	"</label><hr><table id=tablaTicketsDetalleCierres style='width:98%'></table><label id=labelDescuentoTicketsDetalle>" + cadenaDescuento +
+	"</label><hr>";
+	divTicketsDetalle.innerHTML=texto;
+	var tablaDetalles=document.getElementById('tablaTicketsDetalleCierres');
+	var total=0;
+	for (var i in detalles){
+		if (detalles[i].nodeType!==1)continue;
+		var detalle=detalles[i];
+		var row=tablaDetalles.insertRow(-1);
+		var cellUnidades=row.insertCell(0);
+		var cellArticulo=row.insertCell(1);
+		var cellPrecio=row.insertCell(2);
+		var cellSubtotal=row.insertCell(3);
+		cellUnidades.innerHTML=detalle.childNodes[0].firstChild.nodeValue;
+		cellArticulo.innerHTML=detalle.childNodes[1].firstChild.nodeValue;
+		cellPrecio.innerHTML=detalle.childNodes[2].firstChild.nodeValue;
+		var subTotal=parseFloat(detalle.childNodes[3].firstChild.nodeValue);
+		cellSubtotal.innerHTML=subTotal.toFixed(2);
+		total+=parseFloat(detalle.childNodes[3].firstChild.nodeValue);
+	}
+	if (descuento!=0) total=total-(total*descuento)/100;
+	total=total.toFixed(2);
+	divTicketsDetalle.innerHTML+="<label id=labelTotalTicketsDetalleCierres style='font-size:20px' total="+total+">Total: " + total + "</label>";
+	divTicketsDetalle.innerHTML+="<br>IGIC incluido"
+	if (marca!=null) divTicketsDetalle.innerHTML+="<br><hr><label id=labelTicketDetalleMarcaCierres>"+marca+"</label>";
+	else divTicketsDetalle.innerHTML+="<br><hr><label id=labelTicketDetalleMarca>Gracias por su visita</label>";
+}
+function parseXmlMovimientosCaja(XMLdocument){
+	var movimientos=XMLdocument.getElementsByTagName('movimiento');
+	var tablaMovimientos=document.getElementById('tablaDivListadoMovimientosCajaCierresBody');
+	limpiarTabla(tablaMovimientos);
+	var total=0;
+	for (var i in movimientos){
+		if (movimientos[i].nodeType!==1) continue;
+		var movimiento=movimientos[i];
+		var row=tablaMovimientos.insertRow(-1);
+		var cellFecha=row.insertCell(0);
+		var cellTicket=row.insertCell(1);
+		var cellMarca=row.insertCell(2);
+		var cellCantidad=row.insertCell(3);
+		cellFecha.innerHTML=movimiento.childNodes[0].firstChild.nodeValue;
+		cellTicket.innerHTML=movimiento.childNodes[1].firstChild.nodeValue;
+		if (movimiento.childNodes[2].hasChildNodes()) cellMarca.innerHTML=movimiento.childNodes[2].firstChild.nodeValue;
+		cellCantidad.innerHTML=movimiento.childNodes[3].firstChild.nodeValue;
+		total+=parseFloat(movimiento.childNodes[3].firstChild.nodeValue);
+	}
+	var footTotal=document.getElementById('tablaDivListadoMovimientosCajaCierresFoot');
+	limpiarTabla(footTotal);
+	var row=footTotal.insertRow(-1);
+	row.innerHTML="<tr><td colspan='4' align='right' id=movimientosCajaTotal>Total: "+total.toFixed(2)+"</td></tr>" ;
+}
+function parseXmlMovimientosCajaTPV(XMLdocument){
+	var movimientos=XMLdocument.getElementsByTagName('movimiento');
+	var tablaMovimientos=document.getElementById('tablaDivListadoMovimientosCajaCierresBody');
+	limpiarTabla(tablaMovimientos);
+	for (var i in movimientos){
+		if (movimientos[i].nodeType!==1) continue;
+		var movimiento=movimientos[i];
+		if (movimiento.childNodes[1].firstChild.nodeValue!='0') continue;
+		var row=tablaMovimientos.insertRow(-1);
+		var idMovimiento=movimiento.getAttribute('id');
+		row.setAttribute('id',idMovimiento);
+		var cellFecha=row.insertCell(0);
+		var cellTicket=row.insertCell(1);
+		var cellMarca=row.insertCell(2);
+		var cellCantidad=row.insertCell(3);
+		var cellEliminar=row.insertCell(4);
+		cellFecha.innerHTML=movimiento.childNodes[0].firstChild.nodeValue;
+		cellTicket.innerHTML=movimiento.childNodes[1].firstChild.nodeValue;
+		if (movimiento.childNodes[2].hasChildNodes()) cellMarca.innerHTML=movimiento.childNodes[2].firstChild.nodeValue;
+		cellCantidad.innerHTML=movimiento.childNodes[3].firstChild.nodeValue;
+		if (cellMarca.innerHTML=='pago') cellCantidad.innerHTML+="<label class=eliminarTelefono "+
+		"onclick=\"mostrarDialogoSiNo('Va usted a eliminar un pago a proveedores. ¿Desea Continuar?','eliminarMovimientoCaja("+idMovimiento+")')\">-</label>";
+		else cellCantidad.innerHTML+="<label class=eliminarTelefono "+
+		"onclick=\"mostrarDialogoSiNo('Va usted a eliminar la inclusión de cambio en la caja. ¿Desea Continuar?','eliminarMovimientoCaja("+idMovimiento+");')\">-</label>";
+	}
+}
+function parseXmlPagosCaja(XMLdocument){
+	var movimientos=XMLdocument.getElementsByTagName('movimiento');
+	var tablaMovimientos=document.getElementById('tablaDivListadoMovimientosCajaCierresBody');
+	limpiarTabla(tablaMovimientos);
+	for (var i in movimientos){
+		if (movimientos[i].nodeType!==1) continue;
+		var movimiento=movimientos[i];
+		var row=tablaMovimientos.insertRow(-1);
+		var idPago=movimiento.getAttribute('id');
+		var funcion="ocultarElemento('divListadoMovimientosCajaCierres');insertarPagoCompras('"+idPago+"')";
+		row.setAttribute('onclick',funcion);
+		row.setAttribute('class','rowListadoArticulo');
+		var cellFecha=row.insertCell(0);
+		var cellTicket=row.insertCell(1);
+		var cellMarca=row.insertCell(2);
+		var cellCantidad=row.insertCell(3);
+		cellFecha.innerHTML=movimiento.childNodes[0].firstChild.nodeValue;
+		cellTicket.innerHTML=movimiento.childNodes[1].firstChild.nodeValue;
+		if (movimiento.childNodes[2].hasChildNodes()) cellMarca.innerHTML=movimiento.childNodes[2].firstChild.nodeValue;
+		cellCantidad.innerHTML=movimiento.childNodes[3].firstChild.nodeValue;
+	}
+}
+function parseXmlProveedores(XMLdocument){
+	var proveedores=XMLdocument.getElementsByTagName('proveedor');
+	var tablaProveedores=document.getElementById('tablaListadoProveedoresBody');
+	limpiarTabla(tablaProveedores);
+	for (var i in proveedores){
+		if (proveedores[i].nodeType!==1) continue;
+		var proveedor=proveedores[i];
+		var row=tablaProveedores.insertRow(-1);
+		var cellProveedor=row.insertCell(0);
+		var idProveedor=proveedor.getAttribute('id');
+		row.setAttribute('mysqlId',idProveedor);
+		row.setAttribute('class','rowsListadoArticulo');
+		var texto='rellenaDatosProveedores('+idProveedor+');resetearEstiloTabla("tablaListadoProveedoresBody","rowsListadoArticulo","class");cambiarEstilo(this,"rowsListadoArticuloSeleccionado","class")';
+		row.setAttribute('onclick',texto);
+		cellProveedor.innerHTML=proveedor.childNodes[0].firstChild.nodeValue;
+	}
+}
+function parseXmlRecuperarComanda(XMLdocument){
+	var detalles=XMLdocument.getElementsByTagName('comandasDetalle');
+	for (var i in detalles){
+		if (detalles[i].nodeType!==1) continue;
+		var detalle=detalles[i];
+		var idArticulo=detalle.childNodes[0].firstChild.nodeValue;
+		var unidades=detalle.childNodes[1].firstChild.nodeValue;
+		añadirArticuloTPV(idArticulo,unidades);
+	}
+}
+function parseXmlRellenaAlergenos(XMLdocument){
+	if (XMLdocument.getElementsByTagName('alergeno').length==0){
+		limpiarAlergenos();
+		return;
+	} 
+	var alergeno=XMLdocument.getElementsByTagName('alergeno')[0];
+	for (var i=1;i<15;i++){
+		var imgAlergeno=document.getElementById('alergeno'+i);
+		var seleccionado=imgAlergeno.getAttribute('seleccionado');
+		var valor=alergeno.childNodes[i].firstChild.nodeValue;	
+		if (valor=="1" && seleccionado=="false" || valor=="0" && seleccionado=="true") cambiarImagenAlergeno(imgAlergeno);
+	}	
+
+}
+function parseXmlRellenaArticulo(XMLdocument){
+	var articulo=XMLdocument.getElementsByTagName('articulo')[0];
+	var nombreArticulo=articulo.childNodes[7].firstChild.nodeValue;
+	document.getElementById('inputArticulo1').value=nombreArticulo;
+	
+	if (articulo.childNodes[0].firstChild!=null) {
+		var descripcion=articulo.childNodes[0].firstChild.nodeValue;
+		document.getElementById('textareaDescripcionArticulo1').value=descripcion;
+	}
+	var precio=articulo.childNodes[1].firstChild.nodeValue;
+	document.getElementById('inputPrecioArticulo').value=precio;
+	
+	var unidad=articulo.childNodes[2].firstChild.nodeValue;
+	seleccionarSelectorId(document.getElementById('selectorUnidadesArticulos'),unidad);
+	
+	var stock=articulo.childNodes[3].firstChild.nodeValue;
+	document.getElementById('inputStockArticulo').value=stock;
+	
+	var seccion=articulo.childNodes[4].firstChild.nodeValue;
+	seleccionarSelectorId(document.getElementById('selectorSeccionesArticulos'),seccion);
+	
+	var impuesto=articulo.childNodes[5].firstChild.nodeValue;
+	seleccionarSelectorId(document.getElementById('selectorImpuestosArticulos'),impuesto);
+	
+	var utiles=articulo.childNodes[8].firstChild.nodeValue;
+	if (utiles==1) document.getElementById('inputUtilesArticulo').checked=true;
+	else document.getElementById('inputUtilesArticulo').checked=false;
+	var vegetariano=articulo.childNodes[9].firstChild.nodeValue;
+	if (vegetariano==1) document.getElementById('inputTipoArticulo').checked=true;
+	else document.getElementById('inputTipoArticulo').checked=false;
+	var activo=articulo.childNodes[10].firstChild.nodeValue;
+	if (activo==1) document.getElementById('inputActivoArticulo').checked=true;
+	else document.getElementById('inputActivoArticulo').checked=false;
+	
+	
+	var idArchivo=articulo.childNodes[6].firstChild.nodeValue;
+	var query="SELECT nombreArchivo FROM archivos WHERE id="+idArchivo;
+	var nombreArchivo=enviarQuery(query,false);
+	document.getElementById('imagenArticulo').src="./recursos/"+nombreArchivo;
+		
+	var barras=XMLdocument.getElementsByTagName('Cbarra');
+	var tablaCodigoBarras=document.getElementById('tablaCodigoBarrasBody');
+	while (tablaCodigoBarras.rows.length!=0){
+		tablaCodigoBarras.deleteRow(-1);
+	}
+	for (var i=0;i<barras.length;i++) {
+		if (barras[i].nodeType===1){
+			var barra=barras[i];
+			var row=tablaCodigoBarras.insertRow(-1);
+			cellCodigo=row.insertCell(0);
+			cellEliminar=row.insertCell(1);
+			cellCodigo.innerHTML=barra.firstChild.nodeValue;
+			var funcion="mostrarDialogoSiNo('Va usted a eliminar este código de barras,¿Desea continuar?','eliminarCodigoBarras("+barra.firstChild.nodeValue+")')"
+			cellEliminar.innerHTML='<label class="eliminarTelefono" onclick="'+funcion+'">-</label>';
+		}
+	}
+	
+	var MysqlId=articulo.getAttribute('id');
+	var objeto=document.getElementById('divArticuloEditado');
+	objeto.setAttribute('MysqlID',MysqlId);
+	objeto.style.display='none';
+	var texto=document.getElementById('textoArticuloEditado');
+	texto.innerHTML="Articulo editado: " + nombreArticulo;
+	
+	var objeto=document.getElementById('divArticuloEditadoCodigos');
+	objeto.setAttribute('MysqlID',MysqlId);
+	objeto.style.display='none';
+	var texto=document.getElementById('textoArticuloEditadoCodigos');
+	texto.innerHTML="Articulo editado: " + nombreArticulo;
+
+	var objeto=document.getElementById('divArticuloEditadoAlergenos');
+	objeto.setAttribute('MysqlID',MysqlId);
+	objeto.style.display='none';
+	var texto=document.getElementById('textoArticuloEditadoAlergenos');
+	texto.innerHTML="Articulo editado: " + nombreArticulo;
+	
+	rellenarAlergenos(MysqlId);
+	rellenarCamposIdiomas(MysqlId);
+	rellenaComprasArticulos(MysqlId);
+}
+function parseXmlRellenaBanderasArticulo(XMLdocument){
+	var idiomas=XMLdocument.getElementsByTagName('idioma');
+	var divBanderas=document.getElementById('divBanderas');
+	divBanderas.innerHTML='';
+	var tablaInsertarArticulos=document.getElementById('tablaInsertarArticulos');
+	var rowArticulo=document.getElementById('rowArticulo1');
+	var rowDescripcion=document.getElementById('rowDescripcion1');
+	var z=1;
+	for (var i in idiomas) {
+		if (idiomas[i].nodeType!==1) continue;
+		idioma=idiomas[i];
+		var idIdioma=idioma.getAttribute('id');
+		var nombreIdioma=idioma.childNodes[0].firstChild.nodeValue;
+		var idArchivo=idioma.childNodes[1].firstChild.nodeValue;
+		var nombreArchivo=idioma.childNodes[2].firstChild.nodeValue;
+		divBanderas.innerHTML+='<img class=listadoBanderas onclick=cambiarIdioma("'+idIdioma
+		+'") height="30px" width="50px" src="./recursos/'+nombreArchivo+'">';
+		if (nombreIdioma=='Castellano') continue;
+		var node=document.getElementById('rowArticulo'+idIdioma);
+		if (node!=null){
+			node.parentNode.removeChild(node);
+			node=document.getElementById('rowDescripcion'+idIdioma);
+			node.parentNode.removeChild(node);
+		}
+		var newRowArticulo=rowArticulo.cloneNode(true);
+		var newRowDescripcion=rowDescripcion.cloneNode(true);
+		var k=2*z +1;
+		var rowTabla=tablaInsertarArticulos.insertRow(z);
+		rowTabla.innerHTML=newRowArticulo.innerHTML;
+		rowTabla.setAttribute('id','rowArticulo'+idIdioma);
+		rowTabla.style.display='none';
+		var input=rowTabla.getElementsByTagName('input')[0];
+		input.setAttribute('id','inputArticulo'+idIdioma)
+		var rowTabla2=tablaInsertarArticulos.insertRow(k);
+		rowTabla2.innerHTML=newRowDescripcion.innerHTML;
+		rowTabla2.setAttribute('id','rowDescripcion'+idIdioma);
+		rowTabla2.style.display='none';
+		var textArea=rowTabla2.getElementsByTagName('textarea')[0];
+		textArea.setAttribute('id','textareaDescripcionArticulo'+idIdioma)
+	}
+}
+function parseXmlRellenaCamposIdiomas(XMLdocument,idArticulo){
+	var idiomas=XMLdocument.getElementsByTagName('idioma');
+	for (var i in idiomas){
+		if (idiomas[i].nodeType!==1) continue;
+		idioma=idiomas[i];
+		var idIdioma=idioma.getAttribute('id');
+		if (idIdioma==1) continue;
+		var nombreIdioma=idioma.childNodes[0].firstChild.nodeValue;
+		var query="SELECT articulo FROM idiomasDetalle WHERE idIdioma=" +idIdioma+" AND idArticulo="+idArticulo;
+		var articulo=enviarQuery(query,false);
+		if (articulo!=null)	document.getElementById('inputArticulo'+idIdioma).value=articulo;
+		var query="SELECT descripcion FROM idiomasDetalle WHERE idIdioma=" +idIdioma+" AND idArticulo="+idArticulo;
+		var descripcion=enviarQuery(query,false);
+		if (descripcion!=null)	document.getElementById('textareaDescripcionArticulo'+idIdioma).value=descripcion;
+	}
+}
+function parseXmlRellenaComandasTPV(XMLdocument,idComandaSeleccionada){
+	var divCeldaTPVComandas=document.getElementById('divCeldaTPVComandas');
+	limpiarObjeto(divCeldaTPVComandas);
+	var comandas=XMLdocument.getElementsByTagName('comanda');
+	for(var i in comandas){
+		if (comandas[i].nodeType!==1) continue;
+		var comanda=comandas[i];
+		var idComanda=comanda.getAttribute('id');
+		var cliente=comanda.childNodes[0].firstChild.nodeValue;
+		var fechaHora=comanda.childNodes[2].firstChild.nodeValue;
+		if (comanda.childNodes[3].hasChildNodes()) var direccion=comanda.childNodes[3].firstChild.nodeValue;
+		else var direccion="";
+		var divComandaInnerHTML="<div class=divComandasDetalle mysqlId="+idComanda+" id=divComanda"+idComanda+" onclick=seleccionarComanda(this)><label id=labelClienteDivComanda"+
+		" style='float:left'>"+cliente+"</label><label id=labelFechaHoraDivComanda>"+fechaHora+
+		"</label><label class=labelEliminarTPVComandas onclick='mostrarDialogoSiNo(\"Va usted a eliminar esta comanda"+
+		" y todos sus datos, ¿Desea Continuar?\",\"eliminarComandaTPV("+idComanda+")\")'>-</label>"+
+		"<label class=labelTraspasarTPVComandas onclick='recuperarComanda("+idComanda+")'>&</label><hr>"+
+		"<label id=labelDireccionDivComanda>"+direccion+
+		"</label><hr><table class=tablaArticulosDivComanda id=tablaArticulosDivComanda"+idComanda+"></table></div>";
+		divCeldaTPVComandas.innerHTML+=divComandaInnerHTML;
+		var tablaArticulosDivComanda=document.getElementById("tablaArticulosDivComanda"+idComanda);
+		var comandasDetalle=comanda.getElementsByTagName('comandasDetalle');
+		for(var j in comandasDetalle){
+			if (comandasDetalle[j].nodeType!==1) continue;
+			var detalle=comandasDetalle[j];
+			var idDetalle=detalle.getAttribute('id');
+			var articulo=detalle.childNodes[0].firstChild.nodeValue;
+			var idArticulo=detalle.childNodes[0].getAttribute('id');
+			var unidades=detalle.childNodes[1].firstChild.nodeValue;
+			var tipoUnidades=detalle.childNodes[1].getAttribute('id');
+			var row=tablaArticulosDivComanda.insertRow(-1);
+			row.setAttribute('class','rowsArticulosDivComanda');
+			row.setAttribute('onclick','resetearEstiloTablaComanda('+idComanda+');'+
+			'cambiarEstilo(this,"rowsArticulosDivComandaSeleccionado","class")');
+			row.setAttribute('mysqlId',idArticulo);
+			row.setAttribute('mysqlIdDetalle',idDetalle);
+			var cellUnidades=row.insertCell(0);
+			var cellArticulos=row.insertCell(1);
+			var cellEliminarArticulo=row.insertCell(2);
+			var cellAñadirNota=row.insertCell(3);
+			cellUnidades.innerHTML=unidades;
+			cellArticulos.innerHTML=articulo;
+			cellAñadirNota.innerHTML="+";
+			cellAñadirNota.setAttribute('class','labelTraspasarTPVComandas');
+			cellAñadirNota.setAttribute('onclick','mostrarNotas('+idArticulo+','+idDetalle+')');
+			cellEliminarArticulo.innerHTML="-";
+			cellEliminarArticulo.setAttribute('class','labelEliminarTPVComandas');
+			funcion='mostrarDialogoSiNo("Va usted a eliminar este articulo de la comanda, ' +
+			'¿Desea Continuar?","eliminarArticuloComandaTPV('+idDetalle+')")';
+			cellEliminarArticulo.setAttribute('onclick',funcion);
+			
+			var suplementos=detalle.getElementsByTagName('suplemento');
+			for (var z in suplementos){
+				if (suplementos[z].nodeType!==1) continue;
+				var suplemento=suplementos[z];
+				var idSuplemento=suplemento.getAttribute('id');
+				var articulo=suplemento.childNodes[0].firstChild.nodeValue;
+				var idArticulo=suplemento.childNodes[0].getAttribute('id');
+				var row=tablaArticulosDivComanda.insertRow(-1);
+				row.setAttribute('class','rowsArticulosDivComandaSuplementos');
+				row.setAttribute('onclick','resetearEstiloTablaComanda('+idComanda+');'+
+				'cambiarEstilo(this,"rowsArticulosDivComandaSuplementosSeleccionado","class")');
+				row.setAttribute('mysqlId',idArticulo);
+				row.setAttribute('mysqlIdDetalle',idSuplemento);
+				var cellUnidades=row.insertCell(0);
+				var cellArticulos=row.insertCell(1);
+				var cellEliminarArticulo=row.insertCell(2);
+				cellUnidades.innerHTML=unidades;
+				cellArticulos.innerHTML=articulo;
+				cellEliminarArticulo.innerHTML="-";
+				cellEliminarArticulo.setAttribute('class','labelEliminarTPVComandas');
+				funcion='mostrarDialogoSiNo("Va usted a eliminar este articulo de la comanda, ' +
+				'¿Desea Continuar?","eliminarArticuloSuplementoComandaTPV('+idSuplemento+')")';
+				cellEliminarArticulo.setAttribute('onclick',funcion);
+			}
+			var notas=detalle.getElementsByTagName('nota');
+			for (var z in notas){
+				if (notas[z].nodeType!==1) continue;
+				var nota=notas[z];
+				var idNota=nota.getAttribute('id');
+				var textoNota=nota.firstChild.nodeValue;
+				var row=tablaArticulosDivComanda.insertRow(-1);
+				row.setAttribute('class','rowsArticulosDivComandaSuplementos');
+				row.setAttribute('id','rowNota'+idNota);
+				var cellVoid=row.insertCell(0);
+				var cellNota=row.insertCell(1);
+				var cellEliminarNota=row.insertCell(2);
+				cellNota.setAttribute('mysqlId',idNota);
+				cellNota.innerHTML=textoNota;
+				cellEliminarNota.setAttribute('class','labelEliminarTPVComandas');
+				funcion='mostrarDialogoSiNo("Va usted a eliminar esta nota de la comanda, ' +
+				'¿Desea Continuar?","eliminarNotaComandaTPV('+idNota+')")';
+				cellEliminarNota.setAttribute('onclick',funcion);
+				cellEliminarNota.innerHTML="-";
+			}
+		}
+	}
+	if (comandaSeleccionada==0) return;
+	comandaSeleccionada=String.trim(comandaSeleccionada);
+	var divComanda=document.getElementById('divComanda'+comandaSeleccionada);
+	seleccionarComanda(divComanda);
+	scrollToObjeto(document.getElementById('divCeldaTPVComandas'),divComanda.offsetTop);
+}
+function parseXmlRellenaComprasArticulos(XMLdocument){
+	var compras=XMLdocument.getElementsByTagName('compra');
+	var tablaComprasArticulos=document.getElementById('tablaComprasArticulosBody');
+	limpiarTabla(tablaComprasArticulos);
+	for (var i in compras){
+		if (compras[i].nodeType!==1) continue;
+		var compra=compras[i];
+		var row=tablaComprasArticulos.insertRow(-1);
+		var cellFecha=row.insertCell(0);
+		var cellProveedor=row.insertCell(1);
+		var cellFactura=row.insertCell(2);
+		var cellCantidad=row.insertCell(3);
+		var cellPrecio=row.insertCell(4);
+		cellFecha.innerHTML=compra.childNodes[0].firstChild.nodeValue;
+		cellProveedor.innerHTML=compra.childNodes[1].firstChild.nodeValue;
+		cellFactura.innerHTML=compra.childNodes[2].firstChild.nodeValue;
+		cellCantidad.innerHTML=compra.childNodes[3].firstChild.nodeValue;
+		cellPrecio.innerHTML=compra.childNodes[4].firstChild.nodeValue;
+	}
+}
+function parseXmlRellenaCliente(XMLdocument){
+	limpiarClientes();
+	var clientes=XMLdocument.getElementsByTagName('cliente');
+	var cliente=clientes[0];
+	var idCliente=cliente.getAttribute('id');
+	var nombre=cliente.childNodes[0].firstChild.nodeValue;
+	if (cliente.childNodes[1].firstChild!=null)	
+		document.getElementById('textAreaDireccionCliente').value=cliente.childNodes[1].firstChild.nodeValue;
+	
+	document.getElementById('inputNombreCliente').value=nombre;
+		
+	var divEditado=document.getElementById('divClienteEditado');
+	divEditado.setAttribute('mysqlId',idCliente);
+	
+	var telefonos=XMLdocument.getElementsByTagName('telefono');
+	var tablaTelefonos=document.getElementById('tablaTelefonosClienteBody');
+	limpiarTabla(tablaTelefonos);
+	for (var i in telefonos){
+		if (telefonos[i].nodeType!==1) continue;
+		var telefono=telefonos[i];
+		var row=tablaTelefonos.insertRow(-1);
+		var cellTelefono=row.insertCell(0);
+		var cellContacto=row.insertCell(1);
+		var cellTipo=row.insertCell(2);
+		
+		cellTelefono.innerHTML=telefono.childNodes[0].firstChild.nodeValue;
+		cellContacto.innerHTML=telefono.childNodes[1].firstChild.nodeValue;
+		cellTipo.innerHTML=telefono.childNodes[2].firstChild.nodeValue+'<label style="float:right" class="eliminarTelefono" onclick="eliminarRow(this)">-</label>';
+	}
+	
+}
+function parseXmlRellenaDatosCompra(XMLdocument){
+	var compras=XMLdocument.getElementsByTagName('compra');
+	var compra=compras[0];
+	var idCompra=compra.getAttribute('id');
+	var idProveedor=compra.childNodes[0].firstChild.nodeValue;
+	var objeto=document.getElementById('selectorProveedorCompras');
+	seleccionarSelectorId(objeto,idProveedor);
+	var factura=compra.childNodes[1].firstChild.nodeValue;
+	var objeto=document.getElementById('inputFacturaCompras');
+	objeto.value=factura;
+	var fechaFactura=compra.childNodes[2].firstChild.nodeValue;
+	var objeto=document.getElementById('inputFechaCompras');
+	objeto.value=fechaFactura;
+	var total=compra.childNodes[3].firstChild.nodeValue;
+	var objeto=document.getElementById('inputTotalCompras');
+	objeto.value=total;
+	
+	var idPago=parseInt(compra.childNodes[4].firstChild.nodeValue);
+	if (idPago!=0){
+		var objeto=document.getElementById('divPagosCompras');
+		objeto.childNodes[1].innerHTML='Pago por caja nº: '+ idPago;
+		objeto.setAttribute('mysqlId',idPago);
+		objeto.style.display='block';
+	}
+	else{
+		var objeto=document.getElementById('divPagosCompras');
+		objeto.childNodes[0].innerHTML="";
+		objeto.setAttribute('mysqlId',"");
+		objeto.style.display='none';
+	}
+	var detalles=XMLdocument.getElementsByTagName('detalle');
+	var tablaDetallesCompras=document.getElementById('tablaDetallesComprasBody');
+	limpiarTabla(tablaDetallesCompras);
+	for (var i in detalles) {
+		if (detalles[i].nodeType!==1) continue;
+		var detalle=detalles[i];
+		var row=tablaDetallesCompras.insertRow(-1);
+		var cellCajas=row.insertCell(0);
+		var cellUnidades=row.insertCell(1);
+		var cellArticulo=row.insertCell(2);
+		var cellPrecio=row.insertCell(3);
+		var cellImpuesto=row.insertCell(4);
+		var cellEliminar=row.insertCell(5);
+		
+		cellCajas.innerHTML='1';
+		cellUnidades.innerHTML=detalle.childNodes[1].firstChild.nodeValue;
+		cellArticulo.innerHTML=detalle.childNodes[3].firstChild.nodeValue;
+		cellArticulo.setAttribute('mysqlId',detalle.childNodes[0].getAttribute('id'));
+		cellPrecio.innerHTML=detalle.childNodes[2].firstChild.nodeValue;
+		cellImpuesto.innerHTML=detalle.childNodes[3].firstChild.nodeValue;
+		cellEliminar.innerHTML='<label style="float:right" class="eliminarTelefono" onclick="eliminarRow(this)">-</label>';
+	}	
+	var objeto=document.getElementById('divCompraEditado');
+	objeto.setAttribute('MysqlID',idCompra);
+	objeto.style.display='none';
+	var texto=document.getElementById('textoArticuloEditado');
+	texto.innerHTML="Compra editada nº: " + idCompra;
+}
+function parseXmlRellenaNotas(XMLdocument){
+	var notas=XMLdocument.getElementsByTagName('nota');
+	var tablaNotas=document.getElementById('tablaDivNotas');
+	limpiarTabla(tablaNotas);
+	for (var i in notas){
+		if (notas[i].nodeType!==1) continue;
+		var row=tablaNotas.insertRow(-1);
+		var cellNotas=row.insertCell(0);
+		cellNotas.innerHTML=notas[i].firstChild.nodeValue;
+		cellNotas.setAttribute('class','rowsListadoArticulo');
+		cellNotas.setAttribute('onclick','añadirNota("'+notas[i].firstChild.nodeValue+'");ocultarElemento("divNotas")');
+	}
+}
+function parseXmlRellenaProveedor(XMLdocument){
+	var proveedores=XMLdocument.getElementsByTagName('proveedor');
+	var proveedor=proveedores[0];
+	var idProveedor=proveedor.getAttribute('id');
+	var nombre=proveedor.childNodes[0].firstChild.nodeValue;
+	if (proveedor.childNodes[1].firstChild!=null){
+	    var direccion=proveedor.childNodes[1].firstChild.nodeValue;
+	    document.getElementById('textAreaDireccionProveedor').value=direccion;	
+	}
+	else document.getElementById('textAreaDireccionProveedor').value="";
+	document.getElementById('inputProveedor').value=nombre;
+	
+	var divEditado=document.getElementById('divProveedorEditado');
+	divEditado.setAttribute('mysqlId',idProveedor);
+	
+	var telefonos=XMLdocument.getElementsByTagName('telefono');
+	var tablaTelefonos=document.getElementById('tablaTelefonosProveedorBody');
+	limpiarTabla(tablaTelefonos);
+	for (var i in telefonos){
+		if (telefonos[i].nodeType!==1) continue;
+		var telefono=telefonos[i];
+		var row=tablaTelefonos.insertRow(-1);
+		var cellTelefono=row.insertCell(0);
+		var cellContacto=row.insertCell(1);
+		var cellTipo=row.insertCell(2);
+		
+		cellTelefono.innerHTML=telefono.childNodes[0].firstChild.nodeValue;
+		cellContacto.innerHTML=telefono.childNodes[1].firstChild.nodeValue;
+		cellTipo.innerHTML=telefono.childNodes[2].firstChild.nodeValue+'<label style="float:right" class="eliminarTelefono" onclick="eliminarRow(this)">-</label>';
+	}
+		
+}
+function parseXmlRellenaProveedoresCompras(XMLdocument){
+	var proveedores=XMLdocument.getElementsByTagName('proveedor');
+	var selectorProveedores=document.getElementById('selectorProveedorCompras');
+	limpiarSelector(selectorProveedores);
+	for (var i in proveedores){
+		if (proveedores[i].nodeType!==1) continue;
+		var proveedor=proveedores[i];
+		var mysqlId=proveedor.getAttribute('id');
+		añadirOpcion(selectorProveedores,proveedor.childNodes[0].firstChild.nodeValue,mysqlId);
+	}
+}
+function parseXmlRellenaTablaArticulosTPV(XMLdocument){
+	var articulos=XMLdocument.getElementsByTagName('articulo');
+	var tablaArticulosTeclasRapidas=document.getElementById('tablaArticulosTeclasRapidas');
+	while (tablaArticulosTeclasRapidas.rows.length!=0){
+		tablaArticulosTeclasRapidas.deleteRow(-1);
+	}
+	for (var i in articulos) {
+		var row=tablaArticulosTeclasRapidas.insertRow(-1);
+		if (articulos[i].nodeType===1){
+			var id=articulos[i].getAttribute('id');
+		}
+		else continue;
+		var objeto2=document.getElementById('divTablaArticulosTeclasRapidas');
+		row.setAttribute('MysqlId',id);
+		row.setAttribute('class','rowsListadoArticulo');
+		var funcion='añadirArticuloTPV(this);ocultarElemento("divTablaArticulosTeclasRapidas");';
+		row.setAttribute('onclick',funcion);
+		var cellArticulo=row.insertCell(0);
+		var cellPrecio=row.insertCell(1);
+		var nombreArticulo=articulos[i].childNodes[3].firstChild.nodeValue;
+		cellArticulo.innerHTML=nombreArticulo;
+		var precio=articulos[i].childNodes[2].firstChild;
+		cellPrecio.innerHTML=precio.nodeValue;
+	}
+}
+function parseXmlRellenaTablaClientes(XMLdocument){
+	var clientes=XMLdocument.getElementsByTagName('cliente');
+	var tablaArticulosClientes=document.getElementById('tablaClientesBody');
+	limpiarTabla(tablaArticulosClientes);
+	for (var i in clientes) {
+		if (clientes[i].nodeType!==1) continue;
+		var cliente=clientes[i];
+		var row=tablaArticulosClientes.insertRow(-1);
+		var id=cliente.getAttribute('id');
+		var objeto2=document.getElementById('divTablaClientes');
+		var position=objeto2.getAttribute('position');
+		row.MysqlId=id;
+		row.setAttribute('class','rows');
+		var funcion='asignarTeclaComanda(' + position + ',' + id + ');ocultarElemento("divTablaClientes")';
+		row.setAttribute('onclick',funcion);
+		var cellCliente=row.insertCell(0);
+		var cellDireccion=row.insertCell(1);
+		cellCliente.innerHTML=cliente.childNodes[0].firstChild.nodeValue;
+		if (cliente.childNodes[1].firstChild!=null)	cellDireccion.innerHTML=cliente.childNodes[1].firstChild.nodeValue;
+	}
+	
+}
+function parseXmlRellenaTablaClientesTPV(XMLdocument){
+	var clientes=XMLdocument.getElementsByTagName('cliente');
+	var tablaClientesTPV=document.getElementById('tablaClientesBodyTPV');
+	limpiarTabla(tablaClientesTPV);
+	for (var i in clientes) {
+		if (clientes[i].nodeType!==1) continue;
+		var cliente=clientes[i];
+		var row=tablaClientesTPV.insertRow(-1);
+		var id=cliente.getAttribute('id');
+		var objeto2=document.getElementById('divTablaClientes');
+		var position=objeto2.getAttribute('position');
+		row.MysqlId=id;
+		row.setAttribute('class','rows');
+		var funcion='seleccionarClientesTPV(' + id + ');ocultarElemento("divTablaClientes")';
+		row.setAttribute('onclick',funcion);
+		var cellCliente=row.insertCell(0);
+		var cellDireccion=row.insertCell(1);
+		cellCliente.innerHTML=cliente.childNodes[0].firstChild.nodeValue;
+		if (cliente.childNodes[1].firstChild!=null)	cellDireccion.innerHTML=cliente.childNodes[1].firstChild.nodeValue;
+	}
+	
+}
+function parseXmlRellenaTablaTeclasRapidas(XMLdocument,numPanel){
+	var articulos=XMLdocument.getElementsByTagName('articulo');
+	var tablaArticulosTeclasRapidas=document.getElementById('tablaArticulosTeclasRapidas');
+	while (tablaArticulosTeclasRapidas.rows.length!=0){
+		tablaArticulosTeclasRapidas.deleteRow(-1);
+	}
+	for (var i in articulos) {
+		var row=tablaArticulosTeclasRapidas.insertRow(-1);
+		if (articulos[i].nodeType===1){
+			var id=articulos[i].getAttribute('id');
+		}
+		else continue;
+		var objeto2=document.getElementById('divTablaArticulosTeclasRapidas');
+		var position=objeto2.getAttribute('position');
+		row.MysqlId=id;
+		row.setAttribute('class','rows');
+		if (document.getElementById('divPanelAumentarTeclasRapidas').style.display=='none'){
+			var funcion='asignarTeclaRapida(' + position + ',' + id + ','+numPanel+
+			');ocultarElemento("divTablaArticulosTeclasRapidas");cambiarPanelTeclasRapidas('+numPanel+')';
+		}
+		else{
+			var funcion='asignarTeclaRapida(' + position + ',' + id + ','+numPanel+
+			');ocultarElemento("divTablaArticulosTeclasRapidas");cambiarPanelAumentarTeclasRapidas('+numPanel+')';
+		}
+		
+		row.setAttribute('onclick',funcion);
+		var cellArticulo=row.insertCell(0);
+		var cellPrecio=row.insertCell(1);
+		var nombreArticulo=articulos[i].childNodes[3].firstChild;
+		cellArticulo.innerHTML=nombreArticulo.nodeValue;
+		var precio=articulos[i].childNodes[2].firstChild;
+		cellPrecio.innerHTML=precio.nodeValue;
+	}
+}
+function parseXmlSecciones (XMLdocument){
+	var secciones=XMLdocument.getElementsByTagName('seccion');
+	var tablaSecciones=document.getElementById('tablaSeccionesBody');
+	var objetoSelector=document.getElementById('selectorSeccionesArticulos');
+	limpiarSelector(objetoSelector);
+	while (tablaSecciones.rows.length!=0){
+		tablaSecciones.deleteRow(-1);
+	}
+	for (var i in secciones) {
+		var row=tablaSecciones.insertRow(-1);
+		if (secciones[i].nodeType===1){
+			var id=secciones[i].getAttribute('id');
+		}
+		else continue;
+		row.id='rowTablaSeccionId'+id;
+		var cellSeccion=row.insertCell(0);
+		var cellOrden=row.insertCell(1);
+		var cellEditar=row.insertCell(2);
+		var cellEliminar=row.insertCell(3);
+		cellEliminar.setAttribute('class','celdaBotonEliminar');
+		cellEditar.setAttribute('class','celdaBotonEditar');
+		row.setAttribute('class','rows');
+		var nombre=secciones[i].childNodes[0].firstChild.nodeValue;
+		var orden=secciones[i].childNodes[1].firstChild.nodeValue;
+		cellSeccion.innerHTML=nombre;
+		cellOrden.innerHTML=orden;
+		cellEliminar.innerHTML="<label class=eliminarSeccion onclick='eliminarSeccion()'>-</label>";
+		cellEditar.innerHTML="<label class=editarSeccion>z</label>";
+		var texto="mostrarDialogoSiNo('Va usted a eliminar una sección. ¿Desea Continuar?','eliminarSeccion(\"" + nombre + "\")')";
+		cellEliminar.setAttribute('onclick',texto);
+		texto="mostrarDialogoSiNo('Va usted a editar una sección. ¿Desea Continuar?','editarSeccion(\"" + id + "\",\"" + nombre + "\",\"" + orden + "\")')";
+		cellEditar.setAttribute('onclick',texto);
+		añadirOpcion(objetoSelector,nombre,id);
+	}
+}
+function parseXmlSettings (XMLdocument){
+	var settings=XMLdocument.getElementsByTagName('setting');
+	var tablaSettings=document.getElementById('tablaSettings');
+	limpiarTabla(tablaSettings);
+	for (var i in settings) {
+		if (settings[i].nodeType!==1) continue;
+		var setting=settings[i];
+		var labelSetting=setting.getAttribute('id');
+		var valorSetting=setting.firstChild.nodeValue;
+		var row=tablaSettings.insertRow(-1);
+		var cellLabel=row.insertCell(0);
+		var cellValor=row.insertCell(1);
+		var cellEditar=row.insertCell(2);
+		var cellEliminar=row.insertCell(3);
+		cellLabel.innerHTML=labelSetting;
+		cellEliminar.innerHTML="<label class=eliminarSetting>-</label>";
+		cellEditar.innerHTML="<label class=editarSetting>z</label>";
+		if (i==3){
+			 cellValor.innerHTML="<select id=selectorImpresoras></select>";
+			 var selectorImpresoras=document.getElementById('selectorImpresoras');
+			 for (var j in listaImpresoras){
+				 añadirOpcion(selectorImpresoras,listaImpresoras[j],listaImpresoras[j]);
+			 }
+			 seleccionarSelectorId(selectorImpresoras,valorSetting);
+		}
+		else {
+			cellValor.innerHTML=valorSetting;
+		}
+		var texto="mostrarDialogoSiNo('Va usted a eliminar este setting. ¿Desea Continuar?','eliminarSetting(\"" +
+		labelSetting+ "\")')";
+		cellEliminar.setAttribute('onclick',texto);
+		texto="mostrarDialogoSiNo('Va usted a editar este setting. ¿Desea Continuar?','editarSetting(\"" +
+		labelSetting+ "\",\""+valorSetting+"\")')";
+		cellEditar.setAttribute('onclick',texto);
+	}
+	rellenaListadoSettings();
+}
+function parseXmlUnidades (XMLdocument){
+	var unidades=XMLdocument.getElementsByTagName('unidad');
+	var tablaUnidades=document.getElementById('tablaUnidadesBody');
+	var objetoSelector=document.getElementById('selectorUnidadesArticulos');
+	limpiarSelector(objetoSelector);
+	while (tablaUnidades.rows.length!=0){
+		tablaUnidades.deleteRow(-1);
+	}
+	for (var i in unidades) {
+		var row=tablaUnidades.insertRow(-1);
+		if (unidades[i].nodeType===1){
+			var id=unidades[i].getAttribute('id');
+		}
+		else continue;
+		row.id='rowTablaUnidades'+id;
+		var cellUnidad=row.insertCell(0);
+		var cellEditar=row.insertCell(1);
+		var cellEliminar=row.insertCell(2);
+		cellEliminar.setAttribute('class','celdaBotonEliminar');
+		cellEditar.setAttribute('class','celdaBotonEditar');
+		row.setAttribute('class','rows');
+		var unidad=unidades[i].childNodes[0];
+		cellUnidad.innerHTML=unidad.nodeValue;
+		cellEditar.innerHTML="<label class=editarSeccion>z</label>";
+		cellEliminar.innerHTML="<label class=eliminarUnidad onclick='eliminarUnidad()'>-</label>";
+		var texto="mostrarDialogoSiNo('Va usted a eliminar una unidad. ¿Desea Continuar?','eliminarUnidad(\"" + unidad.nodeValue + "\")')";
+		cellEliminar.setAttribute('onclick',texto);
+		texto="mostrarDialogoSiNo('Va usted a editar una unidad. ¿Desea Continuar?','editarUnidad(\"" + id + "\",\"" + unidad.nodeValue + "\")')";
+		cellEditar.setAttribute('onclick',texto);
+		añadirOpcion(objetoSelector,unidad.nodeValue,id);
+		
+	}
+}
+function prepararCompras(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ProveedoresXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaProveedoresCompras(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function prepararTPV(numeroTicket){
+	if (numeroTicket!=null) actualizarLabelTicket(numeroTicket);
+	else actualizarLabelTicket();
+	limpiarTPVTablaArticulos();
+	limpiarObjeto('labelTextoDivTPVprincipal');
+	descuento=0;
+	var botonMostrarComandas=document.getElementById('botonMostrarComandas');
+	var funcion="mostrarTeclasComandas()";
+	botonMostrarComandas.setAttribute('onclick',funcion);
+	botonMostrarComandas.innerHTML="p";
+	var labelDivTPVComanda=document.getElementById('labelDivTPVComanda');
+	labelDivTPVComanda.removeAttribute('mysqlId');
+	ocultarElemento(labelDivTPVComanda);
+}
+function procesarAñadirArticuloTPV(XMLdocument,unidades){
+	if (document.getElementById('celdaTPVComandas').style.display!='none') {
+		parseXmlAñadirArticuloComanda(XMLdocument,unidades);
+		return;
+	}
+	parseXmlAñadirArticulo(XMLdocument,unidades);
+	actualizarTotalTPV();
+	limpiarObjeto('labelTextoDivTPVprincipal');
+}
+function pulsarTecla(event,numChar,funcion){
+	if (event.keyCode==numChar){
+		this[funcion]();
+	} 
+}
+function realizarBackup(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=backup",true);
+	xmlhttp.send();
+}
+function recuperarComanda(idComanda){
+	limpiarTPVTablaArticulos();
+	ocultarDivComandasTPV();
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ComandasXML&idComanda="+idComanda,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRecuperarComanda(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+	var labelDivTPVComanda=document.getElementById('labelDivTPVComanda');
+	labelDivTPVComanda.setAttribute('mysqlId',idComanda);
+	labelDivTPVComanda.style.display='inline';
+	var query="SELECT cliente FROM clientes WHERE id=(SELECT idCliente FROM comandas WHERE id="+idComanda
+	+" AND idTicket=0 ORDER BY fechaHora DESC LIMIT 1)";
+	var cliente=enviarQuery(query,false,false);
+	labelDivTPVComanda.innerHTML="Comanda "+cliente+ " <label id=ocultarComanda class='websimbol' "+
+	" onclick='ocultarElemento(\"labelDivTPVComanda\")'>-</label>";
+}
+function rellenarAlergenos(idArticulo){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=AlergenosXML&idArticulo=" + idArticulo,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaAlergenos(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function rellenaArticulo(Objeto){
+	var MysqlId=Objeto.getAttribute('MysqlId');
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=devolverDatosArticuloXML&articulo=" + MysqlId,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaArticulo(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function rellenarCamposIdiomas(idArticulo){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=IdiomasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaCamposIdiomas(xmlhttp.responseXML,idArticulo);
+	}
+	xmlhttp.send();
+}
+function rellenarComandasTPV(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ComandasListadoXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaComandasTPV(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function rellenaComprasArticulos(idArticulo){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=ComprasArticulosXML&idArticulo=" +idArticulo,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaComprasArticulos(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function rellenaDatosClientes(mysqlId){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=devolverDatosClienteXML&idCliente=" + mysqlId,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaCliente(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function rellenaDatosProveedores (mysqlId){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=devolverDatosProveedorXML&idProveedor=" + mysqlId,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaProveedor(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function rellenaDetalleCompras(mysqlId){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=devolverDatosCompraXML&idCompra=" + mysqlId,true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaDatosCompra(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function rellenaListadoSettings(){
+	var tablaSettings=document.getElementById('tablaSettings');
+	for (var i=0;i<tablaSettings.rows.length;i++){
+		var row=tablaSettings.rows[i];
+		if(i==3){
+			listaSettings[i]=document.getElementById('selectorImpresoras').value;
+			continue;
+		}
+		listaSettings[i]=row.cells[1].innerHTML;
+	}
+}
+function rellenarIdiomas(){
+	var xmlhttp;
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","./PHP/funcionesXML.php?funcion=IdiomasXML",true);
+	xmlhttp.onreadystatechange=function()  {
+		if (xmlhttp.readyState==4 && xmlhttp.status==200) parseXmlRellenaBanderasArticulo(xmlhttp.responseXML);
+	}
+	xmlhttp.send();
+}
+function reloadImg(id) {
+	   var obj = document.getElementById(id);
+	   var src = obj.src;
+	   var pos = src.indexOf('?');
+	   if (pos >= 0) {
+	      src = src.substr(0, pos);
+	   }
+	   var date = new Date();
+	   obj.src = src + '?v=' + date.getTime();
+	   return false;
+}
+function resetearEstiloTabla(nombreTabla,Estilo,Atributo){
+	var tabla= document.getElementById(nombreTabla);
+	for (var i=0;i<tabla.rows.length;i++){
+		var tablerow=tabla.rows[i];
+		tablerow.setAttribute(Atributo,Estilo);
+	}
+}
+function resetearEstiloTablaComanda(idComanda){
+	var tabla= document.getElementById('tablaArticulosDivComanda'+idComanda);
+	for (var i=0;i<tabla.rows.length;i++){
+		var tablerow=tabla.rows[i];
+		if (tablerow.getAttribute('class')=='rowsArticulosDivComandaSeleccionado') 
+				tablerow.setAttribute('class','rowsArticulosDivComanda');
+		if (tablerow.getAttribute('class')=='rowsArticulosDivComandaSuplementosSeleccionado') 
+				tablerow.setAttribute('class','rowsArticulosDivComandaSuplementos');
+	}
+}
+function restaurarTPV(){
+	var inputRestaurarTPV=document.getElementById('inputRestaurarTPV');
+	if(inputRestaurarTPV.value==''){
+		mostrarDialogoAdvertencia('Debe introducir un archivo');
+		return;
+	}
+	var fileExtension=inputRestaurarTPV.value.substr(inputRestaurarTPV.value.indexOf(".")+1);
+	if (fileExtension!="sql") {
+		mostrarDialogoAdvertencia('Debe introducir un archivo con extensión sql');
+		return;
+	}
+	var funcion="ejecutarRestauracion('"+inputRestaurarTPV.form.id +"')";
+	mostrarDialogoSiNo("La restauración de la aplicación significa la pérdida de todos los datos " +
+	"actuales y la sustitución por aquellos que se encuentren en el backup, ¿Desea continuar?",funcion);
+}
+function scrollToObjeto(objeto,posY){
+	objeto.scrollTop=posY-55;
+}
+function seleccionarArticuloTeclasRapidas (objeto,numPanel){
+	var objeto2=document.getElementById('divTablaArticulosTeclasRapidas');
+	objeto2.style.display='block';
+	var position=objeto.getAttribute('position');
+	objeto2.setAttribute('position',position);
+	var divEliminarTeclaRapidas=document.getElementById('divEliminarTeclaRapidas');
+	if (document.getElementById('divPanelAumentarTeclasRapidas').style.display=='none'){
+		var funcion='asignarTeclaRapida('+position+',0,'+numPanel+
+		');ocultarElemento("divTablaArticulosTeclasRapidas");cambiarPanelTeclasRapidas('+numPanel+')';
+		divEliminarTeclaRapidas.setAttribute('onclick',funcion);
+	}
+	else{
+		var funcion='asignarTeclaRapida('+position+',0,'+numPanel+
+		');ocultarElemento("divTablaArticulosTeclasRapidas");cambiarPanelAumentarTeclasRapidas('+numPanel+')';
+		divEliminarTeclaRapidas.setAttribute('onclick',funcion);
+	}
+	
+	buscarCoincidenciasArticulos(numPanel,'inputfiltro');
+}
+function seleccionarClienteTeclasComandas(objeto){
+	var objeto2=document.getElementById('divTablaClientes');
+	objeto2.style.display='block';
+	objeto2.setAttribute('position',objeto.getAttribute('position'));
+	buscarCoincidenciasClientes();
+}
+function seleccionarClientesTPV(idCliente){
+	var query="SELECT idTicket FROM comandas WHERE idCliente="+idCliente+" ORDER BY id DESC LIMIT 1";
+	var idTicket=enviarQuery(query,false);
+	var tablaArticulos=document.getElementById('tablaTPVArticulosBody');
+	if (idTicket==0&&idTicket!='') {
+		query="SELECT id FROM comandas WHERE idCliente="+idCliente+" ORDER BY id DESC LIMIT 1";
+		idComanda=enviarQuery(query,false);
+	}
+	else{
+		var fechaHora=devolverFechaHoraMysql();
+		query="INSERT INTO comandas (idCliente,fechaHora) VALUES ("+idCliente+",'"+fechaHora+"')";
+		enviarQuery(query,false);
+		query="SELECT id FROM comandas WHERE idCliente="+idCliente+" ORDER BY id DESC LIMIT 1";
+		idComanda=enviarQuery(query,false);
+	}
+	mostrarComanda(idComanda);
+	ocultarElemento(document.getElementById('divTablaComandasTPV'));
+}
+function seleccionarComanda(divComanda){
+	if (divComanda==null)return;
+	try {
+		var seleccionAnterior=document.getElementById('divComanda'+comandaSeleccionada);
+		seleccionAnterior.setAttribute('class','divComandasDetalle');
+	}
+	catch (e) {
+		
+	}
+	if (divComanda.getAttribute('id')!='divComanda'+comandaSeleccionada && comandaSeleccionada!=0){
+		resetearEstiloTablaComanda(comandaSeleccionada);
+	}
+	divComanda.setAttribute('class','divComandasDetalleSeleccionada');
+	comandaSeleccionada=divComanda.getAttribute('mysqlId');
+}
+function seleccionarSelectorId(selector,id){
+	for (var i in selector.options){
+		if (selector.options[i].value==id){
+			selector.selectedIndex=i;
+			return;
+		}
+	}
+}
+function seleccionarTeclaComandaTPV(objeto){
+	var idCliente=objeto.getAttribute('mysqlId');
+	if (idCliente==null) return;
+	var query="SELECT idTicket FROM comandas WHERE idCliente="+idCliente+" ORDER BY id DESC LIMIT 1";
+	var idTicket=String.trim(enviarQuery(query,false));
+	var tablaArticulos=document.getElementById('tablaTPVArticulosBody');
+	if (idTicket==0&&idTicket!='') {
+		query="SELECT id FROM comandas WHERE idCliente="+idCliente+" ORDER BY id DESC LIMIT 1";
+		idComanda=enviarQuery(query,false);
+	}
+	else{
+		var fechaHora=devolverFechaHoraMysql();
+		query="INSERT INTO comandas (idCliente,fechaHora) VALUES ("+idCliente+",'"+fechaHora+"')";
+		enviarQuery(query,false);
+		query="SELECT id FROM comandas WHERE idCliente="+idCliente+" ORDER BY id DESC LIMIT 1";
+		idComanda=enviarQuery(query,false);
+	}
+	mostrarComanda(idComanda);
+	ocultarElemento(document.getElementById('divTablaComandasTPV'));
+}
+function sleep(ms) {
+	var dt = new Date();
+	dt.setTime(dt.getTime() + ms);
+	while (new Date().getTime() < dt.getTime());
+}
