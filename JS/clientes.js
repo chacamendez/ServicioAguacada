@@ -7,94 +7,97 @@
 
 //////LOGIN FUNCTIONS
 
-function loggin(){
-	var usuario=document.getElementById('username');
-  	var password=document.getElementById('password');
-	var xmlhttp;
-	xmlhttp=new XMLHttpRequest();
-  xmlhttp.open("GET","./PHP/ExecuteAction.php?action=loggin&destino=token",false);
-	xmlhttp.onreadystatechange=function()  {
-		if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-			var response=xmlhttp.responseText.trim();
-			key=response.substr(0,16);
-			var token=key;
-			iv=response.substr(16);
-  			var textBytes = aesjs.utils.utf8.toBytes(usuario.value);
-			var res=textBytes.length % 16;
-			if (res != 0){
-			for (res;res<16;res++) {
-			    var x = new Uint8Array(textBytes.length+1);
-			    x.set(textBytes, 0);
-			    x[textBytes.length]=32;
-			    textBytes=x;
-			  }
-			}
-			key=aesjs.utils.utf8.toBytes(key);
-			iv=aesjs.utils.utf8.toBytes(iv);
-			var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
-			var encryptedBytes = aesCbc.encrypt(textBytes);
-			var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
-			var encryptedBytes = aesjs.utils.hex.toBytes(encryptedHex);
-			var xmlhttp2;
-			xmlhttp2=new XMLHttpRequest();
-			xmlhttp2.open("GET","./PHP/ExecuteAction.php?action=loggin&destino=logginProcess&data="+encryptedHex,false);
-			xmlhttp2.onreadystatechange=function()  {
-				if (xmlhttp2.readyState==4 && xmlhttp2.status==200 && xmlhttp2.responseText!="") {
-					var encryptedHex =xmlhttp2.responseText.trim();
-					var encryptedBytes=aesjs.utils.hex.toBytes(encryptedHex);
-					var aesCbc = new aesjs.ModeOfOperation.cbc(key,iv);
-					var decryptedBytes = aesCbc.decrypt(encryptedBytes);
-					var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
-					var salt = decryptedText.substr(0, 29);
-					var response=decryptedText.substr(29,32);
+function loggin() {
+    var usuario = document.getElementById('username');
+    var password = document.getElementById('password');
+    var xmlhttp;
+    xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST", "./PHP/ExecuteAction.php?action=loggin&destino=token", false);
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var response = xmlhttp.responseText.trim();
+            key = response.substr(0, 16);
+            var token = key;
+            iv = response.substr(16);
+            var textBytes = aesjs.utils.utf8.toBytes(usuario.value);
+            var res = textBytes.length % 16;
+            if (res != 0) {
+                for (res; res < 16; res++) {
+                    var x = new Uint8Array(textBytes.length + 1);
+                    x.set(textBytes, 0);
+                    x[textBytes.length] = 32;
+                    textBytes = x;
+                }
+            }
+            key = aesjs.utils.utf8.toBytes(key);
+            iv = aesjs.utils.utf8.toBytes(iv);
+            var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
+            var encryptedBytes = aesCbc.encrypt(textBytes);
+            var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
+            var encryptedBytes = aesjs.utils.hex.toBytes(encryptedHex);
+            
+            var xmlhttp2;
+            xmlhttp2 = new XMLHttpRequest();
+            xmlhttp2.open("POST", "./PHP/ExecuteAction.php?action=loggin&destino=logginProcess", false);
+            var formData = new FormData();
+            formData.append("data", encryptedHex);
+            
+            xmlhttp2.onreadystatechange = function() {
+                if (xmlhttp2.readyState == 4 && xmlhttp2.status == 200 && xmlhttp2.responseText != "") {
+                    var encryptedHex = xmlhttp2.responseText.trim();
+                    var encryptedBytes = aesjs.utils.hex.toBytes(encryptedHex);
+                    var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
+                    var decryptedBytes = aesCbc.decrypt(encryptedBytes);
+                    var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
+                    var salt = decryptedText.substr(0, 29);
+                    var response = decryptedText.substr(29, 32);
 
-					var bcrypt = dcodeIO.bcrypt;
-		      			var hash = bcrypt.hashSync(password.value, salt);
+                    var bcrypt = dcodeIO.bcrypt;
+                    var hash = bcrypt.hashSync(password.value, salt);
 
-					var encryptedBytes=aesjs.utils.hex.toBytes(response);
-					key=hash.substr(44);
-					iv=hash.substr(8,16);
-					key = aesjs.utils.utf8.toBytes(key);
-					iv = aesjs.utils.utf8.toBytes(iv);
-					var aesCbc = new aesjs.ModeOfOperation.cbc(key,iv);
-					var decryptedBytes = aesCbc.decrypt(encryptedBytes);
-					var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
+                    var encryptedBytes = aesjs.utils.hex.toBytes(response);
+                    key = hash.substr(44);
+                    iv = hash.substr(8, 16);
+                    key = aesjs.utils.utf8.toBytes(key);
+                    iv = aesjs.utils.utf8.toBytes(iv);
+                    var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
+                    var decryptedBytes = aesCbc.decrypt(encryptedBytes);
+                    var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
 
-					if (decryptedText==token){
+                    if (decryptedText == token) {
 
-						var textBytes = aesjs.utils.utf8.toBytes(decryptedText);
-						var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
-						var encryptedBytes = aesCbc.encrypt(textBytes);
-						var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
-						xmlhttp3=new XMLHttpRequest();
-
-						xmlhttp3.open("GET","./PHP/ExecuteAction.php?action=loggin&destino=logginEnd&data="+encryptedHex,false);
-						xmlhttp3.onreadystatechange=function()  {
-							if (xmlhttp3.readyState==4 && xmlhttp2.status==200 && xmlhttp3.responseText.trim()!=""){
-								if ( xmlhttp3.responseText.trim()==token) {
-									executeAction('prepararPanel','&destino=panelLateral');
-								}
-							}
-							else {
-								  iqwerty.toast.Toast('Usuario o clave incorrecta',{settings:{duration:2000}});
-							}
-						}
-
-						xmlhttp3.send();
-					}
-					else{
-						iqwerty.toast.Toast('Usuario o clave incorrecta',{settings:{duration:2000}});
-					}
-				}
-				else {
-						iqwerty.toast.Toast('Usuario o clave incorrecta',{settings:{duration:2000}});
-				}
-			}
-			xmlhttp2.send();
-		}
-	}
-	xmlhttp.send();
-
+                        var textBytes = aesjs.utils.utf8.toBytes(decryptedText);
+                        var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
+                        var encryptedBytes = aesCbc.encrypt(textBytes);
+                        var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
+                        
+                        var xmlhttp3 = new XMLHttpRequest();
+                        xmlhttp3.open("POST", "./PHP/ExecuteAction.php?action=loggin&destino=logginEnd", false);
+                        
+                        var formData3 = new FormData();
+                        formData3.append("data", encryptedHex);
+                        
+                        xmlhttp3.onreadystatechange = function() {
+                            if (xmlhttp3.readyState == 4 && xmlhttp3.status == 200 && xmlhttp3.responseText.trim() != "") {
+                                if (xmlhttp3.responseText.trim() == token) {
+                                    executeAction('prepararPanel', '&destino=panelLateral');
+                                }
+                            } else {
+                                iqwerty.toast.Toast('Usuario o clave incorrecta', { settings: { duration: 2000 } });
+                            }
+                        }
+                        xmlhttp3.send(formData3);
+                    } else {
+                        iqwerty.toast.Toast('Usuario o clave incorrecta', { settings: { duration: 2000 } });
+                    }
+                } else {
+                    iqwerty.toast.Toast('Usuario o clave incorrecta', { settings: { duration: 2000 } });
+                }
+            }
+            xmlhttp2.send(formData);
+        }
+    }
+    xmlhttp.send();
 }
 
 

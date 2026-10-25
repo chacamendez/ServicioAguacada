@@ -1,7 +1,5 @@
 <?php
 
-date_default_timezone_set('Atlantic/Canary');
-
 class Strings{
 	public $cadena;
 	public $error;
@@ -41,18 +39,8 @@ class Strings{
 		return $fecha;
 	}
 	public static function fechaHoraSQL($fecha="",$format='Y-m-d H:i:s'){
-		$zona_base = new DateTimeZone('UTC');
-		$zona_destino = new DateTimeZone('Atlantic/Canary');
-		if (empty($fecha)) {
-        	// Obtiene la hora actual del sistema y la ajusta a la zona horaria de Canarias
-        	$fecha_objeto = new DateTime('now', $zona_base);
-    	} else {
-       		 // Si se proporciona una fecha, primero la crea y luego la convierte a la zona horaria de Canarias
-        	$fecha_objeto = new DateTime($fecha);
-        	
-    }
-		$fecha_objeto->setTimezone($zona_destino);
-       	return $fecha_objeto->format($format);
+		$fecha=new DateTime($fecha);
+		return $fecha->format($format);
 	}
 	public static function fechaHora($fechaSQL=""){
 		$fecha = new DateTime($fechaSQL);

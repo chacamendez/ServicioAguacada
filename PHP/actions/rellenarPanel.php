@@ -96,10 +96,6 @@ if(Session::isLogged()) {
          $fincaDefecto=$usuarioExt->fincaDefecto();
          $stringExportartUsuario=$usuarioExt->exportarUsuario();
 
-
-         //$stringFincaDefecto="<label class=\"fa fa-times-circle buttons2\" id={$usuarioExt->id}idFinca0 onclick=\"executeAction(\'editar\',\'&destino=fincas&idFinca=0&idUsuario={$usuarioExt->id}\')\"></label>";
-         //$stringFincaDefecto="<label class=\"fa fa-times-circle buttons2\" id={$usuarioExt->id}idFinca0 onclick=\"executeAction(\'editar\',\'&destino=fincas&idFinca=0&idUsuario={$usuarioExt->id}\')\"></label>";
-
          $html="<hr> <label class=\"fa fa-plus-circle buttons2\" onclick=\"executeAction(\'prepararPanel\',\'&destino=panelAuxiliarFincas&idUsuario={$usuario['id']}\')\">".
          "</label> {$usuarioExt->toHtml4()}".
          "<br>$telefono<label class=\"fa fa-plus-circle buttons2\" onclick=\"executeAction(\'prepararPanel\',\'&destino=panelAuxiliarTelefonos&idUsuario={$usuario['id']}\')\"></label>{$usuarioExt->toHtml()}".
@@ -235,7 +231,6 @@ if(Session::isLogged()) {
 
        }
      }
-     //echo $query;
      $archivos=archivos::getAll($query);
      if ($archivos) {
 		
@@ -367,7 +362,6 @@ if(Session::isLogged()) {
    }
   break;
 
-  break;
   case "panelAuxiliarUsuarios":
     if (Session::allowed()){
       incluir('comunidades');
@@ -397,7 +391,10 @@ if(Session::isLogged()) {
       $query="SELECT * from mensajes WHERE idUsuario=$idUsuario OR destino=$idUsuario ORDER BY fechaHora";
       incluir('mensajes');
       $mensajes=mensajes::getAll($query);
-      Database::ExecuteQuery("UPDATE mensajes SET leido=1 WHERE idUsuario=$idUsuario");
+      
+      // Actualización de lectura migrada a PDO con parámetros seguros
+      Database::ExecuteQuery("UPDATE mensajes SET leido = 1 WHERE idUsuario = ?", false, [$idUsuario]);
+      
       $JS.="$('#divMensajesVisor').html('');";
       $i=0;
       if ($mensajes){
@@ -420,7 +417,10 @@ if(Session::isLogged()) {
     $query="SELECT * from mensajes WHERE idUsuario=$idUsuario OR destino=$idUsuario ORDER BY fechaHora";
     incluir('mensajes');
     $mensajes=mensajes::getAll($query);
-    Database::ExecuteQuery("UPDATE mensajes SET leido=1 WHERE destino=$idUsuario");
+    
+    // Actualización de lectura migrada a PDO con parámetros seguros
+    Database::ExecuteQuery("UPDATE mensajes SET leido = 1 WHERE destino = ?", false, [$idUsuario]);
+    
     $JS.="$('#divMensajesVisor').html('');";
     $i=0;
     if ($mensajes){
@@ -566,7 +566,6 @@ if(Session::isLogged()) {
    incluir('comunidades');
    if (!empty($_GET['filtroComunidades'])) $filtro=$_GET['filtroComunidades'];
    else $filtro=false;
-   //print_r($_SESSION['search']);
    if (!empty($_GET['searchId'])) {
      $searchId=$_GET['searchId'];
      if ($searchId!=$_SESSION['searchId']) return;
@@ -599,7 +598,6 @@ if(Session::isLogged()) {
        $comunidadExt=classInvoker::nc('comunidades',intval($comunidad['id']),true);
        $JS.="$('#listadoComunidades').append('<div  class=listado>{$comunidad['comunidad']} <div class=\"iconos\"> ".
        "<img  src=\"./RESOURCES/mail.png\" onclick=\"window.open(\'mailto:{$comunidadExt->toMailTo()}\');\" />".
-       //"<label class=\"fa fa-comment buttons\" style=\"background-color:#e8be16\"></label>".
        "<label class=\"fa fa-pencil-square-o buttons\" style=\"background-color:#e3600a\" onclick=\"executeAction(\'prepararPanel\',\'&destino=panelAuxiliarComunidades&idComunidad={$comunidad['id']}\')\" ></label>".
        "<label class=\"fa fa-upload buttons\" style=\"background-color:#0ca2a9\" onclick=\"executeAction(\'prepararPanel\',\'&destino=panelAuxiliarArchivos&idComunidad={$comunidad['id']}\')\"></label>".
        "<label class=\"fa fa-history buttons\" style=\"background-color:#a90c51\" onclick=\"executeAction(\'prepararPanel\',\'&destino=panelAuxiliarHistorial&idUsuario=0&idComunidad={$comunidad['id']}\')\"></label>".
@@ -739,12 +737,9 @@ if(Session::isLogged()) {
   case "panelAuxiliarDirecciones":
     $idUsuario=$_GET["idUsuario"];
     $idDireccion=$_GET["idDireccion"];
-    //if ($idDireccion){
-      incluir("direccionesPostales");
-      $direccion=classInvoker::nc('direccionesPostales',$idDireccion);
-      $JS.="$('#idUsuario').val('$idUsuario');$('#idDireccion').val('$idDireccion');$('#direccion').val('{$direccion->direccionPostal}');$('#destinatario').val('{$direccion->destinatario}');$('#panelAuxiliar').fadeIn('slow');";
-    //}
-    //else $JS.="$('#idUsuario').val('$idUsuario');$('#direccion').val('');$('#panelAuxiliar').fadeIn('slow');";
+    incluir("direccionesPostales");
+    $direccion=classInvoker::nc('direccionesPostales',$idDireccion);
+    $JS.="$('#idUsuario').val('$idUsuario');$('#idDireccion').val('$idDireccion');$('#direccion').val('{$direccion->direccionPostal}');$('#destinatario').val('{$direccion->destinatario}');$('#panelAuxiliar').fadeIn('slow');";
   break;
   case "panelAuxiliarComunidades":
     $idComunidad=$_GET["idComunidad"];
@@ -760,7 +755,7 @@ if(Session::isLogged()) {
     $idCorrespondencia=$_GET["idCorrespondencia"];
     if (empty($idCorrespondencia)){
       $_SESSION['correspondencia']='';
-      $JS.="$('#idCorrespondencia').val('');$('#panelAuxiliar').fadeIn('slow');"; //limpar campos and fade in
+      $JS.="$('#idCorrespondencia').val('');$('#panelAuxiliar').fadeIn('slow');";
       $JS.="executeAction('rellenarPanel','&destino=panelAuxiliarCorrespondenciasSelect',['selectDestinatarios']);";
     }
     else{
@@ -891,7 +886,6 @@ if(Session::isLogged()) {
     $recibos=recibos::getAll($query);
     if ($recibos){
       foreach ($recibos as $recibo) {
-        //rellenar tabla recibos
         $fecha=Strings::fecha($recibo['fecha']);
         $JS.="$('#tablaListadoRecibos').append('<tr><td>{$recibo['concepto']}</td><td>{$recibo['importe']}</td>".
         "<td>$fecha</td><td><label class=\"fa fa-pencil buttons2\" onclick=\"executeAction(\'editar\',\'&destino=panelAuxiliarRecibos&idRecibo={$recibo['id']}\')\" ></label></td>".
@@ -911,7 +905,7 @@ if(Session::isLogged()) {
     $idExportacion=$_GET["idExportacion"];
     if (empty($idCorrespondencia)){
       $_SESSION['exportar']='';
-      $JS.="$('#idExportacion').val('');$('#panelAuxiliar').fadeIn('slow');"; //limpar campos and fade in
+      $JS.="$('#idExportacion').val('');$('#panelAuxiliar').fadeIn('slow');";
       $JS.="executeAction('rellenarPanel','&destino=panelAuxiliarCorrespondenciasSelect',['selectDestinatarios']);";
     }
     else{
@@ -950,7 +944,6 @@ if(Session::isLogged()) {
           }
           $JS.="$('#divComunidadesExportar').css('display','block');";
         }
-        //$JS.="executeAction('rellenarPanel','&destino=panelAuxiliarCorrespondenciasSelectComunidades',['selectComunidadesCorrespondencias']);";
       break;
     }
   }
@@ -1032,12 +1025,10 @@ if(Session::isLogged()) {
 
        }
      }
-     //echo $query;
      $recibos=recibos::getAll($query);
      if ($recibos) {
        foreach ($recibos as $recibo) {
          $fecha=Strings::fecha($recibo['fecha']);
-         /////
          $reciboO=classInvoker::nc('recibos',intval($recibo['id']));
          incluir('usuarios');
          $usuario=classInvoker::nc('usuarios',intVal($recibo['idUsuario']));

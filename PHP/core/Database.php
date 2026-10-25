@@ -3,6 +3,14 @@ class CustomPDOStatement extends PDOStatement {
     public function fetch_row() {
         return $this->fetch(PDO::FETCH_NUM);
     }
+
+    public function fetch_assoc() {
+        return $this->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function fetch_array() {
+        return $this->fetch(PDO::FETCH_BOTH);
+    }
 }
 
 class Database {
@@ -16,7 +24,7 @@ class Database {
     private $host;
     private $DB;
 
-    function __construct($host, $db, $user, $password) {
+    function __construct($host = 'localhost', $db = 'aguacada', $user = 'root', $password = 'Polifem@1') {
         $this->user = $user;
         $this->pass = $password;
         $this->host = $host;
@@ -41,6 +49,9 @@ class Database {
     }
 
     public static function getCon($toUnReset = false) {
+        if (!self::$db) {
+            self::$db = new self();
+        }
         self::$con = self::$db->connect();
         return self::$con;
     }
@@ -48,6 +59,9 @@ class Database {
     public static function ExecuteMultiQuery($query, $value = false, $params = []) {
         $con = self::getCon();
         try {
+            if (!is_array($params)) {
+                $params = [];
+            }
             if ($value) {
                 $stmt = $con->prepare($query);
                 $stmt->execute($params);
@@ -69,6 +83,10 @@ class Database {
     public static function ExecuteQuery($query, $value = false, $params = []) {
         $con = self::getCon();
         try {
+            if (!is_array($params)) {
+                $params = [];
+            }
+            
             $stmt = $con->prepare($query);
             $stmt->execute($params);
             self::$errno = 0;
@@ -89,6 +107,32 @@ class Database {
         }
     }
 
+    // --- MÉTODOS AÑADIDOS PARA RESOLVER LA COMPATIBILIDAD CON LAS CLASES ---
+
+    public static function getRow($query, $params = []) {
+        $result = self::ExecuteQuery($query, false, $params);
+        if ($result) {
+            return $result->fetch_assoc();
+        }
+        return false;
+    }
+
+    public static function getValue($query, $params = []) {
+        $result = self::ExecuteQuery($query, false, $params);
+        if ($result) {
+            $row = $result->fetch(PDO::FETCH_NUM);
+            return $row ? $row[0] : false;
+        }
+        return false;
+    }
+
+    public static function lastInsertId() {
+        $con = self::getCon();
+        return $con->lastInsertId();
+    }
+
+    // ---------------------------------------------------------------------
+
     public static function backup($path = false) {
         Settings::saveDB();
         $clave = "Polifem@1";
@@ -106,7 +150,6 @@ class Database {
 
     public static function restaurarTPV($file = false) {
         if ($file) {
-            // Limpiar tablas
             $query = "SHOW TABLES";
             $tables = Database::ExecuteQuery($query);
             while ($row = $tables->fetch_row()) {
@@ -114,7 +157,6 @@ class Database {
                 Database::ExecuteQuery($query);
             }
             
-            // Restaurar archivo
             $templine = '';
             $lines = file($file);
             foreach ($lines as $line) {
@@ -126,7 +168,6 @@ class Database {
                 }
             }
             
-            // Restablecer archivos (Corregido error tipográfico en 'Databse')
             $query = "SELECT nombreArchivo, archivo FROM archivos";
             $resultado = Database::ExecuteQuery($query);
             while ($row = $resultado->fetch_row()) {

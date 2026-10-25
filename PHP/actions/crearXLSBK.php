@@ -1,16 +1,18 @@
 <?php
-error_reporting(-1);ini_set("display_errors", 1);
+error_reporting(-1);
+ini_set("display_errors", 1);
 session_start();
-$base=__DIR__;
-$base=dirname($base);
-$base=dirname($base);
-//include "$base/PHP/LoadCore.php";
+$base = __DIR__;
+$base = dirname($base);
+$base = dirname($base);
+include "$base/PHP/LoadCore.php";
 
-if(Session::isLogged()) {
-  if (Session::allowed()){
-    $columnas=['id','nombre','usuario','reset','estado','claveDefecto','correspondencia'];
-    $stringCampos=implode($columnas,',');
-    $columnas=  array_merge($columnas,['Direcciones','Destinatarios','Correos','Correos_contacto','Telefonos','Telefonos_contacto','Fincas','Propietarios','Dni','Cuota']);
+if (Session::isLogged()) {
+  if (Session::allowed()) {
+    $columnas = ['id', 'nombre', 'usuario', 'reset', 'estado', 'claveDefecto', 'correspondencia'];
+    $stringCampos = implode(',', $columnas);
+    $columnas = array_merge($columnas, ['Direcciones', 'Destinatarios', 'Correos', 'Correos_contacto', 'Telefonos', 'Telefonos_contacto', 'Fincas', 'Propietarios', 'Dni', 'Cuota']);
+    
     incluirExt('xls');
     incluir('comunidades');
     incluir('usuarios');
@@ -19,64 +21,72 @@ if(Session::isLogged()) {
     incluir('telefonos');
     incluir('fincas');
 
-    $contenidoXLS = "";
-    $breakpoints=[6,8,10];
+    $contenidoXLS = [];
+    $breakpoints = [6, 8, 10];
 
-    $query="SELECT * FROM comunidades";
-    $comunidades=comunidades::getAll($query);
+    // Obtener comunidades con PDO
+    $stmtComunidades = Database::ExecuteQuery("SELECT * FROM comunidades", false);
+    $comunidades = $stmtComunidades ? $stmtComunidades->fetchAll(PDO::FETCH_ASSOC) : [];
+
     foreach ($comunidades as $comunidad) {
-        echo "paso";
-        $idComunidad=$comunidad['id'];
-        $contenidoXLS[]=$comunidad;
-        $contenidoXLS[]=$columnas;
-        $query="SELECT $stringCampos FROM usuarios WHERE idComunidad=$idComunidad";
-          //'<style bgcolor="#FFFF00" color="#0000FF">12345.67</style>']
-        $usuarios=usuarios::getAll($query);
-        if ($usuarios){
+        $idComunidad = $comunidad['id'];
+        $contenidoXLS[] = array_values($comunidad);
+        $contenidoXLS[] = $columnas;
+        
+        // Obtener usuarios con PDO y parámetros seguros
+        $stmtUsuarios = Database::ExecuteQuery("SELECT $stringCampos FROM usuarios WHERE idComunidad = ?", false, [$idComunidad]);
+        $usuarios = $stmtUsuarios ? $stmtUsuarios->fetchAll(PDO::FETCH_ASSOC) : [];
+
+        if ($usuarios) {
             foreach ($usuarios as $usuario) {
-              $idUsuario=$usuario['id'];
-              $query="SELECT direccionPostal,destinatario FROM direccionesPostales WHERE origen='usuarios;$idUsuario'";
-              $direccionesA=direccionesPostales::getAll($query);
-              if ($direccionesA){
+              $idUsuario = $usuario['id'];
+              
+              // Direcciones postales
+              $stmtDir = Database::ExecuteQuery("SELECT direccionPostal, destinatario FROM direccionesPostales WHERE origen = ?", false, ["usuarios;$idUsuario"]);
+              $direccionesA = $stmtDir ? $stmtDir->fetchAll(PDO::FETCH_ASSOC) : [];
+              if ($direccionesA) {
                 foreach ($direccionesA as $direccion) {
-                    $direccion = array_values($direccion);
-                    $usuario[]=$direccion[0];
-                    $usuario[]=$direccion[1];
+                    $usuario[] = $direccion['direccionPostal'];
+                    $usuario[] = $direccion['destinatario'];
                 }
               }
-            $query="SELECT correo,contacto FROM correos WHERE origen='usuarios;$idUsuario'";
-            $correosA=correos::getAll($query);
-            if ($correosA){
-              foreach ($correosA as $correo) {
-                $correo = array_values($correo);
-                $usuario[]=$correo[0];
-                $usuario[]=$correo[1];
-              }
-            }
-            $query="SELECT telefono,contacto FROM telefonos WHERE origen='usuarios;$idUsuario'";
-                $telefonosA=telefonos::getAll($query);
-                if ($telefonosA){
-                  foreach ($telefonosA as $telefono) {
-                    $telefono = array_values($telefono);
-                    $usuario[]=$telefono[0];
-                    $usuario[]=$telefono[1];
+              
+              // Correos
+              $stmtCor = Database::ExecuteQuery("SELECT correo, contacto FROM correos WHERE origen = ?", false, ["usuarios;$idUsuario"]);
+              $correosA = $stmtCor ? $stmtCor->fetchAll(PDO::FETCH_ASSOC) : [];
+              if ($correosA) {
+                foreach ($correosA as $correo) {
+                  $usuario[] = $correo['correo'];
+                  $usuario[] = $correo['contacto'];
                 }
               }
-            $query="SELECT finca FROM fincas WHERE idUsuario=$idUsuario";
-            $fincasA=fincas::getAll($query);
-            if ($fincasA){
-               foreach ($fincasA as $finca) {
-                    $finca = array_values($finca);
-                    $usuario[]=$finca[0];
-               }
+              
+              // Teléfonos
+              $stmtTel = Database::ExecuteQuery("SELECT telefono, contacto FROM telefonos WHERE origen = ?", false, ["usuarios;$idUsuario"]);
+              $telefonosA = $stmtTel ? $stmtTel->fetchAll(PDO::FETCH_ASSOC) : [];
+              if ($telefonosA) {
+                foreach ($telefonosA as $telefono) {
+                  $usuario[] = $telefono['telefono'];
+                  $usuario[] = $telefono['contacto'];
+                }
+              }
+              
+              // Fincas
+              $stmtFin = Database::ExecuteQuery("SELECT finca FROM fincas WHERE idUsuario = ?", false, [$idUsuario]);
+              $fincasA = $stmtFin ? $stmtFin->fetchAll(PDO::FETCH_ASSOC) : [];
+              if ($fincasA) {
+                 foreach ($fincasA as $finca) {
+                    $usuario[] = $finca['finca'];
+                 }
+              }
+              
+              $contenidoXLS[] = array_values($usuario);
             }
-          }
-           $contenidoXLS[]=$usuario;
         }
-        //$contenidoXLS[]=[];
-   }
-  print_r($contenidoXLS);
-   $xlsx = Shuchkin\SimpleXLSXGen::fromArray( $contenidoXLS );
-   //$xlsx->downloadAs('Aguacada.xlsx');
+    }
+    
+    // Generar archivo Excel con SimpleXLSXGen
+    $xlsx = Shuchkin\SimpleXLSXGen::fromArray($contenidoXLS);
+    $xlsx->downloadAs('Aguacada.xlsx');
   }
 }

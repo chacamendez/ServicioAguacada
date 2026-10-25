@@ -1,113 +1,186 @@
 <?php
+class CustomPDOStatement extends PDOStatement {
+    public function fetch_row() {
+        return $this->fetch(PDO::FETCH_NUM);
+    }
+
+    public function fetch_assoc() {
+        return $this->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function fetch_array() {
+        return $this->fetch(PDO::FETCH_BOTH);
+    }
+}
+
 class Database {
-  public static $errno;
-	public static $db;
-	public static $con;
-  public static $errorMessage;
+    public static $errno;
+    public static $db;
+    public static $con;
+    public static $errorMessage;
 
-	function __construct($host,$db,$user,$password){
-		$this->user=$user;$this->pass=$password;$this->host=$host;$this->DB=$db;
-    //$this->user="usuario55";$this->pass="pLy0#r55";$this->host="localhost";$this->DB="tpvWeb";
-	}
+    private $user;
+    private $pass;
+    private $host;
+    private $DB;
 
-	function connect(){
-		$con = new mysqli($this->host,$this->user,$this->pass,$this->DB);
-    if (mysqli_connect_errno()) {
-      $error=$con->connect_error;
-      echo "<error>$error reseteando usuario</error>";
-      exit();
+    function __construct($host = 'localhost', $db = 'aguacada', $user = 'root', $password = 'Polifem@1') {
+        $this->user = $user;
+        $this->pass = $password;
+        $this->host = $host;
+        $this->DB = $db;
     }
-		$con->set_charset("utf8");
-		return $con;
-	}
 
-	public static function getCon($toUnReset=false){
-	  self::$db=new Database('localhost:3306','aguacada','aguacadaAdmin', '9lLg3u$98');
-	  //self::$db=new Database('localhost:3306','aguacada','root','Polifem@1');
-	  self::$con = self::$db->connect();
-	  return self::$con;
-	}
-  public static function ExecuteMultiQuery($query,$value=false){
-		$con=self::getCon();
-		$resultado=$con->multi_query($query);
-		self::$errno=$con->errno;
-		if ($value){
-      $con->next_result();
-	    $resultado=$con->store_result();
-	    $row=$resultado->fetch_row();
-			return $row[0];
-		}
-		else {
-      while ($con->more_results()) {
-        $con->next_result();
-      }
+    function connect() {
+        try {
+            $dsn = "mysql:host={$this->host};dbname={$this->DB};charset=utf8mb4";
+            $con = new PDO($dsn, $this->user, $this->pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_NUM,
+                PDO::ATTR_STATEMENT_CLASS => [CustomPDOStatement::class],
+                PDO::MYSQL_ATTR_MULTI_STATEMENTS => true,
+            ]);
+            return $con;
+        } catch (PDOException $e) {
+            $error = $e->getMessage();
+            echo "<error>{$error} reseteando usuario</error>";
+            exit();
+        }
     }
-	}
-	public static function ExecuteQuery($query,$value=false){
-		$con=self::getCon();
-		$resultado=$con->query($query);
-		self::$errno=$con->errno;
-    self::$errorMessage=$con->error;
-    if ($value){
-      if ($resultado){
-        $row=$resultado->fetch_row();
-  			return $row[0];
-      }
-      else return self::$errorMessage;
 
-		}
-		else return $resultado;
-	}
-  public static function backup($path=false){
-    Settings::saveDB();
-    $clave="Polifem@1";
-    $fecha=date("d-m-Y-H-i-s");
-    $archivo="backupTPV$fecha.sql";
-    if (!$path){
-        $base=__DIR__;
-        $base=dirname($base);
-        $base=dirname($base);
-        $path="$base/Backups/";
-        $path.=$archivo;
+    public static function getCon($toUnReset = false) {
+        if (!self::$db) {
+            self::$db = new self();
+        }
+        self::$con = self::$db->connect();
+        return self::$con;
     }
-    exec("mysqldump -uroot -p$clave --no-create-db --no-create-info tpvAbogado>$path");
-    //copy($path,"/home/elabogado/Dropbox/backup/$archivo");
-  }
-  public static function restaurarTPV($file=false){
-    if ($file){
-      //limpiarTablas
-      $query="SHOW TABLES";
-      $tables=Database::ExecuteQuery($query);
-		  while ($row = $tables->fetch_row()) {
-		      $query="TRUNCATE TABLE " . $row[0];
-	        Database::ExecuteQuery($query);
-	    }
-      //Restaurar archivo
-      $templine = '';
-	    $lines = file($file);
-	    foreach ($lines as $line){
-	       if (substr($line, 0, 2) == '--' || $line == '')	continue;
- 	       $templine .= $line;
-    	    if (substr(trim($line), -1, 1) == ';') {
-            Database::ExecuteQuery($templine);
+
+    public static function ExecuteMultiQuery($query, $value = false, $params = []) {
+        $con = self::getCon();
+        try {
+            if (!is_array($params)) {
+                $params = [];
+            }
+            if ($value) {
+                $stmt = $con->prepare($query);
+                $stmt->execute($params);
+                self::$errno = 0;
+                $row = $stmt->fetch(PDO::FETCH_NUM);
+                return $row ? $row[0] : null;
+            } else {
+                $affected = $con->exec($query);
+                self::$errno = 0;
+                return $affected;
+            }
+        } catch (PDOException $e) {
+            self::$errno = $e->getCode();
+            self::$errorMessage = $e->getMessage();
+            return false;
+        }
+    }
+
+    public static function ExecuteQuery($query, $value = false, $params = []) {
+        $con = self::getCon();
+        try {
+            if (!is_array($params)) {
+                $params = [];
+            }
+            
+            $stmt = $con->prepare($query);
+            $stmt->execute($params);
+            self::$errno = 0;
+
+            if ($value) {
+                $row = $stmt->fetch(PDO::FETCH_NUM);
+                return $row ? $row[0] : self::$errorMessage;
+            } else {
+                return $stmt;
+            }
+        } catch (PDOException $e) {
+            self::$errno = $e->getCode();
+            self::$errorMessage = $e->getMessage();
+            if ($value) {
+                return self::$errorMessage;
+            }
+            return false;
+        }
+    }
+
+    // --- MÉTODOS AÑADIDOS PARA RESOLVER LA COMPATIBILIDAD CON LAS CLASES ---
+
+    public static function getRow($query, $params = []) {
+        $result = self::ExecuteQuery($query, false, $params);
+        if ($result) {
+            return $result->fetch_assoc();
+        }
+        return false;
+    }
+
+    public static function getValue($query, $params = []) {
+        $result = self::ExecuteQuery($query, false, $params);
+        if ($result) {
+            $row = $result->fetch(PDO::FETCH_NUM);
+            return $row ? $row[0] : false;
+        }
+        return false;
+    }
+
+    public static function lastInsertId() {
+        $con = self::getCon();
+        return $con->lastInsertId();
+    }
+
+    // ---------------------------------------------------------------------
+
+    public static function backup($path = false) {
+        Settings::saveDB();
+        $clave = "Polifem@1";
+        $fecha = date("d-m-Y-H-i-s");
+        $archivo = "backupTPV$fecha.sql";
+        if (!$path) {
+            $base = __DIR__;
+            $base = dirname($base);
+            $base = dirname($base);
+            $path = "$base/Backups/";
+            $path .= $archivo;
+        }
+        exec("mysqldump -uroot -p$clave --no-create-db --no-create-info tpvAbogado > $path");
+    }
+
+    public static function restaurarTPV($file = false) {
+        if ($file) {
+            $query = "SHOW TABLES";
+            $tables = Database::ExecuteQuery($query);
+            while ($row = $tables->fetch_row()) {
+                $query = "TRUNCATE TABLE `" . $row[0] . "`";
+                Database::ExecuteQuery($query);
+            }
+            
             $templine = '';
-    	    }
-      }
-      //restablecer archivos
-	    $query="SELECT nombreArchivo,archivo FROM archivos";
-	    Databse::ExecuteQuery($query);
-	    while ($row = $resultado->fetch_row()) {
-          $base=__DIR__;
-          $base=dirname($base);
-          $base=dirname($base);
-		      $nombreArchivo=$row[0];
-		      $archivo = $row[1];
-		      file_put_contents("$base/RESOURCES/$nombreArchivo", $archivo);
-	    }
+            $lines = file($file);
+            foreach ($lines as $line) {
+                if (substr(trim($line), 0, 2) == '--' || trim($line) == '') continue;
+                $templine .= $line;
+                if (substr(trim($line), -1, 1) == ';') {
+                    Database::ExecuteQuery($templine);
+                    $templine = '';
+                }
+            }
+            
+            $query = "SELECT nombreArchivo, archivo FROM archivos";
+            $resultado = Database::ExecuteQuery($query);
+            while ($row = $resultado->fetch_row()) {
+                $base = __DIR__;
+                $base = dirname($base);
+                $base = dirname($base);
+                $nombreArchivo = $row[0];
+                $archivo = $row[1];
+                file_put_contents("$base/RESOURCES/$nombreArchivo", $archivo);
+            }
+        } else {
+            // codigo con file por defecto
+        }
     }
-    else{
-      //codigo con file por defecto
-    }
-  }
 }
 ?>

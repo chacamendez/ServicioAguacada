@@ -434,6 +434,10 @@ function Line($x1, $y1, $x2, $y2)
 
 function Rect($x, $y, $w, $h, $style='')
 {
+	$x = (float)$x;
+    $y = (float)$y;
+    $w = (float)$w;
+    $h = (float)$h;
 	// Draw a rectangle
 	if($style=='F')
 		$op = 'f';
@@ -575,6 +579,8 @@ function AcceptPageBreak()
 
 function Cell($w, $h=0, $txt='', $border=0, $ln=0, $align='', $fill=false, $link='')
 {
+	$w = (float)$w;
+    $h = (float)$h;
 	// Output a cell
 	$k = $this->k;
 	if($this->y+$h>$this->PageBreakTrigger && !$this->InHeader && !$this->InFooter && $this->AcceptPageBreak())

@@ -1,5 +1,6 @@
 <?php
-error_reporting(-1);ini_set("display_errors", 1);
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 session_start();
 $base=__DIR__;
 $base=dirname($base);

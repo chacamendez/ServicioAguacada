@@ -6,8 +6,8 @@ class fincasExt extends fincas {
     
     $html="";
     incluir('propietariosFincas');
-    $query="SELECT idPropietario FROM propietariosFincas WHERE idFinca={$this->id}";
-    $idPropietarios=propietariosFincas::getAll($query);
+    $query="SELECT idPropietario FROM propietariosFincas WHERE idFinca = ?";
+    $idPropietarios=propietariosFincas::getAll($query, [$this->id]);
     if ($idPropietarios){
       
       $html.="$('#tablaPropietarios').append('<tr><td>Propietario</td><td>Dni/Nie</td><td></td><td></td></tr>');";
@@ -28,11 +28,11 @@ class fincasExt extends fincas {
    public function addPropietarios(){
       incluir('propietarios');
       incluir('propietariosFincas');
-      $query="SELECT id FROM fincas WHERE idUsuario={$this->idUsuario} AND fincas.id<>{$this->id} LIMIT 1";
-      $idFinca=fincas::getValue($query);
+      $query="SELECT id FROM fincas WHERE idUsuario = ? AND id <> ? LIMIT 1";
+      $idFinca=fincas::getValue($query, [$this->idUsuario, $this->id]);
       if ($idFinca){
-       $query="SELECT idPropietario FROM propietariosFincas WHERE idFinca=$idFinca";
-       $idPropietarios=propietarios::getAll($query);
+       $query="SELECT idPropietario FROM propietariosFincas WHERE idFinca = ?";
+       $idPropietarios=propietarios::getAll($query, [$idFinca]);
        if ($idPropietarios){
         foreach ($idPropietarios as $idPropietario){
           $propietarioFinca=classInvoker::nc('propietariosFincas');
@@ -47,8 +47,8 @@ class fincasExt extends fincas {
    }
    //Funcion para eliminar la finca y los registros propietariosFincas relacionadas con ella
    public function deleteFinca (){
-      $query="DELETE FROM propietariosFincas WHERE idFinca={$this->id}";
-      Database::ExecuteQuery($query);
+      $query="DELETE FROM propietariosFincas WHERE idFinca = ?";
+      Database::ExecuteQuery($query, [$this->id]);
       $this->delete();
    }
 
@@ -74,9 +74,9 @@ class fincasExt extends fincas {
     $this->update();
   }
   public function updatePropietarios(){
-    $query="SELECT * FROM fincas WHERE idUsuario={$this->idUsuario}";
+    $query="SELECT * FROM fincas WHERE idUsuario = ?";
     incluir('fincas');
-    $fincas=fincas::getAll($query);
+    $fincas=fincas::getAll($query, [$this->idUsuario]);
     if ($fincas){
       foreach ($fincas as $finca) {
         if ($finca['propietarios']==""){
@@ -89,3 +89,4 @@ class fincasExt extends fincas {
   }
 
 }
+?>
