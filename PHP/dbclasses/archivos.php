@@ -49,7 +49,7 @@ class archivos {
     $sqlFields = implode(',', $fields);
     $sqlPlaceholders = implode(',', $placeholders);
     $query = "INSERT INTO `archivos` ($sqlFields) VALUES ($sqlPlaceholders)";
-    Database::ExecuteQuery($query, $values);
+    Database::ExecuteQuery($query, false, $values);
     $this->id = Database::lastInsertId();
   }
 
@@ -64,12 +64,12 @@ class archivos {
     $values[] = $this->id;
     $sqlSets = implode(',', $sets);
     $query = "UPDATE `archivos` SET $sqlSets WHERE `id` = ?";
-    Database::ExecuteQuery($query, $values);
+    Database::ExecuteQuery($query, false, $values);
   }
 
   public function delete(){
     $query = "DELETE FROM `archivos` WHERE `id` = ?";
-    Database::ExecuteQuery($query, [$this->id]);
+    Database::ExecuteQuery($query, false, [$this->id]);
   }
 
   public static function getAll($query=false, $params=false){

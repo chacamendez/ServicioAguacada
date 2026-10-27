@@ -8,15 +8,30 @@ if (Session::isLogged()) {
   switch ($destino) {
     case "usuario":
       if (Session::allowed()) {
+        error_log("[DEBUG ELIMINAR USUARIO] --- INICIO eliminación de usuario ---");
+        
         $confirm = isset($_GET['confirm']) && $_GET['confirm'] === 'true';
         $idUsuario = $_GET['idUsuario'] ?? 0;
         
+        error_log("[DEBUG ELIMINAR USUARIO] confirm: " . ($confirm ? 'true' : 'false') . " | idUsuario recibido: " . var_export($idUsuario, true));
+
         if ($confirm) {
           // Eliminar usuario
+          error_log("[DEBUG ELIMINAR USUARIO] Entrando en bloque de confirmación real para ID: " . intval($idUsuario));
+          
           $usuario = classInvoker::nc('usuarios', intval($idUsuario), true);
-          $usuario->eliminar();
+          
+          if ($usuario) {
+            error_log("[DEBUG ELIMINAR USUARIO] Objeto usuario cargado correctamente. Llamando a ->eliminar()...");
+            $usuario->eliminar();
+            error_log("[DEBUG ELIMINAR USUARIO] ->eliminar() ejecutado con éxito.");
+          } else {
+            error_log("[DEBUG ELIMINAR USUARIO ERROR] No se pudo cargar el objeto usuario con ID: " . $idUsuario);
+          }
+
           $JS .= "iqwerty.toast.Toast('Usuario eliminado con éxito',{settings:{duration:1000}});executeAction('rellenarPanel','&destino=usuarios','filtroUsuarios');";
         } else {
+          error_log("[DEBUG ELIMINAR USUARIO] Mostrando ventana de confirmación Bootbox.");
           $JS = "bootbox.confirm({
             message: 'Va a eliminar un usuario, todos sus datos serán borrados ¿Desea continuar?',
             buttons: {
@@ -30,6 +45,7 @@ if (Session::isLogged()) {
             }
           }).find('.modal-content').css('margin-top','300px');";
         }
+        error_log("[DEBUG ELIMINAR USUARIO] --- FIN eliminación de usuario ---");
       }
       break;
 

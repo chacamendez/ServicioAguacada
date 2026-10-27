@@ -15,7 +15,7 @@ class CustomPDOStatement extends PDOStatement {
 
 class Database {
     public static $errno;
-    public static $db;
+    public static $instance; // Cambiado de $db a $instance para evitar colisiones
     public static $con;
     public static $errorMessage;
 
@@ -49,10 +49,12 @@ class Database {
     }
 
     public static function getCon($toUnReset = false) {
-        if (!self::$db) {
-            self::$db = new self();
+        if (!self::$con) {
+            if (!self::$instance) {
+                self::$instance = new self();
+            }
+            self::$con = self::$instance->connect();
         }
-        self::$con = self::$db->connect();
         return self::$con;
     }
 
@@ -107,7 +109,7 @@ class Database {
         }
     }
 
-    // --- MÉTODOS AÑADIDOS PARA RESOLVER LA COMPATIBILIDAD CON LAS CLASES ---
+    // --- MÉTODOS DE COMPATIBILIDAD ---
 
     public static function getRow($query, $params = []) {
         $result = self::ExecuteQuery($query, false, $params);
@@ -131,7 +133,7 @@ class Database {
         return $con->lastInsertId();
     }
 
-    // ---------------------------------------------------------------------
+    // ---------------------------------
 
     public static function backup($path = false) {
         Settings::saveDB();
@@ -178,8 +180,6 @@ class Database {
                 $archivo = $row[1];
                 file_put_contents("$base/RESOURCES/$nombreArchivo", $archivo);
             }
-        } else {
-            // codigo con file por defecto
         }
     }
 }

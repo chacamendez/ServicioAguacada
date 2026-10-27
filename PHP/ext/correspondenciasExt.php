@@ -28,7 +28,7 @@ class correspondenciasExt extends correspondencias {
   }
 
   function jsonDestinatarios(){
-    return json_decode($this->destinatarios);
+    return json_decode($this->destinatarios,true);
   }
 
   function decodeText(){

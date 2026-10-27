@@ -47,7 +47,7 @@ class telefonos {
     $sqlFields = implode(',', $fields);
     $sqlPlaceholders = implode(',', $placeholders);
     $query = "INSERT INTO `telefonos` ($sqlFields) VALUES ($sqlPlaceholders)";
-    Database::ExecuteQuery($query, $values);
+    Database::ExecuteQuery($query, false, $values);
     $this->id = Database::lastInsertId();
   }
 
@@ -62,12 +62,12 @@ class telefonos {
     $values[] = $this->id;
     $sqlSets = implode(',', $sets);
     $query = "UPDATE `telefonos` SET $sqlSets WHERE `id` = ?";
-    Database::ExecuteQuery($query, $values);
+    Database::ExecuteQuery($query, false, $values);
   }
 
   public function delete(){
     $query = "DELETE FROM `telefonos` WHERE `id` = ?";
-    Database::ExecuteQuery($query, [$this->id]);
+    Database::ExecuteQuery($query, false, [$this->id]);
   }
 
   public static function getAll($query=false, $params=false){

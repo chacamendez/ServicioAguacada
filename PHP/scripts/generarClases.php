@@ -34,6 +34,7 @@ try {
         foreach ($columns as $col) {
             $field = $col['Field'];
             $fieldNames[] = $field;
+            
             if ($col['Key'] == 'PRI') {
                 $primaryKey = $field;
             }
@@ -43,6 +44,7 @@ try {
             $defaultVal = $col['Default'];
             
             if (strpos($type, 'int') !== false || strpos($type, 'float') !== false || strpos($type, 'double') !== false) {
+                // Si es la clave primaria autoincremental, podemos inicializarla a null o 0 de forma segura
                 $val = ($defaultVal !== null) ? $defaultVal : 0;
                 $properties[$field] = $val;
             } else {
@@ -88,12 +90,13 @@ try {
         $classCode .= "    }\n";
         $classCode .= "  }\n\n";
 
-        // Método Insert
+        // Método Insert (con 'false' en ExecuteQuery)
         $classCode .= "  public function insert(){\n";
         $classCode .= "    \$fields = [];\n";
         $classCode .= "    \$placeholders = [];\n";
         $classCode .= "    \$values = [];\n";
         $classCode .= "    foreach (\$this as \$key => \$value) {\n";
+        // Evitamos enviar la clave primaria si está vacía o es 0 para que actúe el auto_increment
         $classCode .= "      if (\$key == '$primaryKey' || \$key == 'detalles') continue;\n";
         $classCode .= "      \$fields[] = \"`\$key`\";\n";
         $classCode .= "      \$placeholders[] = \"?\";\n";
@@ -102,11 +105,11 @@ try {
         $classCode .= "    \$sqlFields = implode(',', \$fields);\n";
         $classCode .= "    \$sqlPlaceholders = implode(',', \$placeholders);\n";
         $classCode .= "    \$query = \"INSERT INTO `$table` (\$sqlFields) VALUES (\$sqlPlaceholders)\";\n";
-        $classCode .= "    Database::ExecuteQuery(\$query, \$values);\n";
+        $classCode .= "    Database::ExecuteQuery(\$query, false, \$values);\n";
         $classCode .= "    \$this->$primaryKey = Database::lastInsertId();\n";
         $classCode .= "  }\n\n";
 
-        // Método Update
+        // Método Update (con 'false' en ExecuteQuery)
         $classCode .= "  public function update(){\n";
         $classCode .= "    \$sets = [];\n";
         $classCode .= "    \$values = [];\n";
@@ -118,16 +121,16 @@ try {
         $classCode .= "    \$values[] = \$this->$primaryKey;\n";
         $classCode .= "    \$sqlSets = implode(',', \$sets);\n";
         $classCode .= "    \$query = \"UPDATE `$table` SET \$sqlSets WHERE `$primaryKey` = ?\";\n";
-        $classCode .= "    Database::ExecuteQuery(\$query, \$values);\n";
+        $classCode .= "    Database::ExecuteQuery(\$query, false, \$values);\n";
         $classCode .= "  }\n\n";
 
-        // Método Delete
+        // Método Delete (con 'false' en ExecuteQuery)
         $classCode .= "  public function delete(){\n";
         $classCode .= "    \$query = \"DELETE FROM `$table` WHERE `$primaryKey` = ?\";\n";
-        $classCode .= "    Database::ExecuteQuery(\$query, [\$this->$primaryKey]);\n";
+        $classCode .= "    Database::ExecuteQuery(\$query, false, [\$this->$primaryKey]);\n";
         $classCode .= "  }\n\n";
 
-        // Método getAll corregido para usar Database::ExecuteQuery y fetch_assoc
+        // Método getAll
         $classCode .= "  public static function getAll(\$query=false, \$params=false){\n";
         $classCode .= "    if (!\$query){\n";
         $classCode .= "      \$query='SELECT * FROM `$table` ORDER BY `$primaryKey` DESC';\n";
@@ -167,12 +170,12 @@ try {
 
         // Guardar el archivo sobrescribiendo el anterior
         file_put_contents($outputDir . $table . '.php', $classCode);
-        echo "Clase generada/actualizada con éxito: $table.php<br>";
+        echo "Clase generada/actualizada con exito: $table.php<br>";
     }
 
-    echo "<br><strong>¡Todas las clases se han regenerado y actualizado en /PHP/dbclases/ correctamente!</strong>";
+    echo "<br><strong>Todas las clases se han regenerado y actualizado en /PHP/dbclasses/ correctamente.</strong>";
 
 } catch (PDOException $e) {
-    echo "Error de conexión o consulta: " . $e->getMessage();
+    echo "Error de conexion o consulta: " . $e->getMessage();
 }
 ?>

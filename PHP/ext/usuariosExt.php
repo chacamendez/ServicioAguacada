@@ -41,12 +41,12 @@ class usuariosExt extends usuarios {
 
   public function setTelefonoDefecto($prefijo, $telefono){
     $query = "UPDATE telefonos SET prefijo = ?, telefono = ? WHERE origen = ? AND defecto = 1";
-    Database::ExecuteQuery($query, [$prefijo, $telefono, "usuarios;{$this->id}"]);
+    Database::ExecuteQuery($query, false, [$prefijo, $telefono, "usuarios;{$this->id}"]);
   }
 
   public function setCorreoDefecto($correo){
     $query = "UPDATE correos SET correo = ? WHERE origen = ? AND defecto = 1";
-    Database::ExecuteQuery($query, [$correo, "usuarios;{$this->id}"]);
+    Database::ExecuteQuery($query, false, [$correo, "usuarios;{$this->id}"]);
   }
 
   public function getDireccionPostal(){
@@ -108,8 +108,8 @@ class usuariosExt extends usuarios {
   public function telefonoDefecto($option = false){
     $query = "SELECT prefijo, telefono FROM telefonos WHERE origen = ? AND defecto = 1";
     $resultado = Database::ExecuteQuery($query, false, ["usuarios;{$this->id}"]);
-    if ($resultado){
-      $row = $resultado->fetch_row();
+    
+    if ($resultado && method_exists($resultado, 'fetch_row') && ($row = $resultado->fetch_row())){
       if ($option){
         switch ($option) {
           case '1':
@@ -127,6 +127,7 @@ class usuariosExt extends usuarios {
       }
       return $telefonoDefecto;
     }
+    return '';
   }
 
   public function getComunidad(){
@@ -137,7 +138,7 @@ class usuariosExt extends usuarios {
 
   public function eliminar(){
     $query = "UPDATE usuarios SET estado = 'eliminado' WHERE id = ?";
-    Database::ExecuteQuery($query, [$this->id]);
+    Database::ExecuteQuery($query, false, [$this->id]);
   }
 
   public function exportarUsuario(){
